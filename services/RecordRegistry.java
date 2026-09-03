@@ -1,5 +1,5 @@
 package services;
-
+import java.util.List;
 import models.Patient;
 import structures.HashTable;
 
@@ -111,6 +111,9 @@ public class RecordRegistry {
     public long getStudentID() { return studentID; }
     public boolean isEmpty() { return patientCount == 0; }
     public boolean needsRehash() { return getLoadFactor() > 0.75; }
+    public List<Patient> getAllPatients() {
+    return table.getAllValues();
+    }
 
     // ==================== STATE MANAGEMENT ====================
 
@@ -131,4 +134,6 @@ public class RecordRegistry {
         this.studentID = source.studentID;
         System.out.println("   [RESTORE] Patient registry synchronized. Count: " + patientCount);
     }
+
+    
 }

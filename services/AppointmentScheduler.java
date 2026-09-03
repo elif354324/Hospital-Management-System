@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Appointment Scheduler with time slot management.
@@ -172,6 +174,11 @@ public class AppointmentScheduler {
     public boolean hasWaitingPatients() { return appointmentQueue.size() > 0; }
     public boolean isEmpty() { return appointmentQueue.isEmpty(); }
     public boolean hasAppointment(String patientId) { return scheduledAppointments.containsKey(patientId); }
+    public List<Appointment> getAllAppointments() {
+    return new ArrayList<>(
+            scheduledAppointments.values()
+    );
+    }
     
     // ==================== STATE MANAGEMENT (UNDO SUPPORT) ====================
     

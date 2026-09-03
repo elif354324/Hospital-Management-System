@@ -1,4 +1,6 @@
 package structures;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generic Hash Table implementation using linear probing for collision resolution.
@@ -12,6 +14,22 @@ public class HashTable<T> {
      * Inner class representing a key-value pair in the hash table.
      * Supports tombstone marking for lazy deletion.
      */
+
+    public List<T> getAllValues() {
+
+    List<T> values = new ArrayList<>();
+
+    for (int i = 0; i < capacity; i++) {
+
+        if (table[i] != null && table[i].isActive()) {
+
+            values.add(table[i].value);
+        }
+    }
+
+    return values;
+}
+
     private static class HashEntry<T> {
         String key;     // Unique identifier
         T value;        // The stored object
