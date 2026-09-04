@@ -13,1248 +13,1117 @@ import java.util.List;
 
 public class DoctorPanel extends JPanel {
 
-    private JTextField idField;
-    private JTextField nameField;
-    private JTextField specialtyField;
+private JTextField idField;
+private JTextField nameField;
+private JTextField specialtyField;
 
-    private JComboBox<String> departmentBox;
+private JComboBox<String> departmentBox;
 
-    private JTextField searchField;
+private JTextField searchField;
 
+private JTable doctorTable;
+private DefaultTableModel tableModel;
 
-    private JTable doctorTable;
+private HashTable<Doctor> doctorRegistry;
 
-    private DefaultTableModel tableModel;
+public DoctorPanel() {
 
+    doctorRegistry = HospitalData.getDoctorRegistry();
 
-    private HashTable<Doctor> doctorRegistry;
+    setLayout(new BorderLayout());
+    setBackground(Color.WHITE);
 
+    createHeader();
+    createMainContent();
 
-    public DoctorPanel() {
+    refreshTable();
+}
 
-        doctorRegistry =
-                HospitalData.getDoctorRegistry();
+// =========================================
+// HEADER
+// =========================================
+
+private void createHeader() {
 
+    JPanel header = new JPanel(new BorderLayout());
+
+    header.setBackground(Color.WHITE);
+
+    header.setBorder(
+            new EmptyBorder(
+                    25,
+                    30,
+                    15,
+                    30
+            )
+    );
+
+    JLabel title = new JLabel("Doctor Management");
+
+    title.setFont(
+            new Font(
+                    "Arial",
+                    Font.BOLD,
+                    30
+            )
+    );
+
+    JLabel subtitle =
+            new JLabel(
+                    "Manage hospital doctors and departments"
+            );
+
+    subtitle.setForeground(Color.GRAY);
+
+    subtitle.setFont(
+            new Font(
+                    "Arial",
+                    Font.PLAIN,
+                    15
+            )
+    );
+
+    JPanel textPanel = new JPanel();
+
+    textPanel.setBackground(Color.WHITE);
+
+    textPanel.setLayout(
+            new BoxLayout(
+                    textPanel,
+                    BoxLayout.Y_AXIS
+            )
+    );
+
+    textPanel.add(title);
+
+    textPanel.add(
+            Box.createVerticalStrut(5)
+    );
+
+    textPanel.add(subtitle);
+
+    header.add(
+            textPanel,
+            BorderLayout.WEST
+    );
+
+    add(
+            header,
+            BorderLayout.NORTH
+    );
+}
+
+// =========================================
+// MAIN CONTENT
+// =========================================
+
+private void createMainContent() {
+
+    JPanel content =
+            new JPanel(
+                    new BorderLayout(
+                            20,
+                            20
+                    )
+            );
+
+    content.setBackground(
+            new Color(
+                    245,
+                    247,
+                    250
+            )
+    );
+
+    content.setBorder(
+            new EmptyBorder(
+                    20,
+                    30,
+                    30,
+                    30
+            )
+    );
+
+    content.add(
+            createControlSection(),
+            BorderLayout.NORTH
+    );
+
+    content.add(
+            createTableSection(),
+            BorderLayout.CENTER
+    );
+
+    add(
+            content,
+            BorderLayout.CENTER
+    );
+}
+
+// =========================================
+// CONTROL SECTION
+// =========================================
+
+private JPanel createControlSection() {
+
+    JPanel panel =
+            new JPanel(
+                    new GridLayout(
+                            1,
+                            2,
+                            20,
+                            0
+                    )
+            );
+
+    panel.setBackground(
+            new Color(
+                    245,
+                    247,
+                    250
+            )
+    );
+
+    panel.add(createDoctorForm());
+    panel.add(createSearchPanel());
+
+    return panel;
+}
+
+// =========================================
+// ADD / UPDATE / DELETE DOCTOR FORM
+// =========================================
+
+private JPanel createDoctorForm() {
+
+    JPanel card = new JPanel();
+
+    card.setLayout(
+            new BoxLayout(
+                    card,
+                    BoxLayout.Y_AXIS
+            )
+    );
 
-        setLayout(
-                new BorderLayout()
-        );
+    card.setBackground(Color.WHITE);
+
+    card.setBorder(
+            BorderFactory.createCompoundBorder(
 
+                    BorderFactory.createLineBorder(
+                            new Color(
+                                    220,
+                                    225,
+                                    230
+                            )
+                    ),
 
-        setBackground(Color.WHITE);
+                    new EmptyBorder(
+                            20,
+                            20,
+                            20,
+                            20
+                    )
+            )
+    );
+
+    JLabel title =
+            new JLabel("Add New Doctor");
+
+    title.setFont(
+            new Font(
+                    "Arial",
+                    Font.BOLD,
+                    20
+            )
+    );
 
+    card.add(title);
 
-        createHeader();
+    card.add(
+            Box.createVerticalStrut(20)
+    );
 
-        createMainContent();
+    // Doctor ID
 
+    card.add(
+            new JLabel("Doctor ID")
+    );
 
-        refreshTable();
-    }
+    idField = new JTextField();
 
+    prepareField(idField);
 
-    // =========================================
-    // HEADER
-    // =========================================
+    card.add(idField);
 
-    private void createHeader() {
+    card.add(
+            Box.createVerticalStrut(10)
+    );
+
+    // Doctor Name
 
-        JPanel header =
-                new JPanel(
-                        new BorderLayout()
-                );
+    card.add(
+            new JLabel("Doctor Name")
+    );
 
+    nameField = new JTextField();
 
-        header.setBackground(Color.WHITE);
+    prepareField(nameField);
 
+    card.add(nameField);
 
-        header.setBorder(
-                new EmptyBorder(
-                        25,
-                        30,
-                        15,
-                        30
-                )
-        );
+    card.add(
+            Box.createVerticalStrut(10)
+    );
 
+    // Specialty
 
-        JLabel title =
-                new JLabel(
-                        "Doctor Management"
-                );
+    card.add(
+            new JLabel("Specialty")
+    );
 
+    specialtyField = new JTextField();
 
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        30
-                )
-        );
+    prepareField(specialtyField);
 
+    card.add(specialtyField);
 
-        JLabel subtitle =
-                new JLabel(
-                        "Manage hospital doctors and departments"
-                );
+    card.add(
+            Box.createVerticalStrut(10)
+    );
 
+    // Department
 
-        subtitle.setForeground(Color.GRAY);
+    card.add(
+            new JLabel("Department")
+    );
 
+    departmentBox = new JComboBox<>();
+
+    loadDepartments();
+
+    departmentBox.setMaximumSize(
+            new Dimension(
+                    Integer.MAX_VALUE,
+                    35
+            )
+    );
+
+    card.add(departmentBox);
+
+    card.add(
+            Box.createVerticalStrut(20)
+    );
+
+    JPanel buttonPanel =
+            new JPanel(
+                    new GridLayout(
+                            2,
+                            2,
+                            10,
+                            10
+                    )
+            );
+
+    buttonPanel.setBackground(Color.WHITE);
+
+    JButton addButton =
+            new JButton("Add Doctor");
 
-        subtitle.setFont(
-                new Font(
-                        "Arial",
-                        Font.PLAIN,
-                        15
-                )
-        );
+    JButton updateButton =
+            new JButton("Update Doctor");
 
+    JButton deleteButton =
+            new JButton("Delete Doctor");
 
-        JPanel textPanel =
-                new JPanel();
+    JButton clearButton =
+            new JButton("Clear");
 
+    addButton.addActionListener(
+            e -> addDoctor()
+    );
 
-        textPanel.setBackground(Color.WHITE);
+    updateButton.addActionListener(
+            e -> updateDoctor()
+    );
 
+    deleteButton.addActionListener(
+            e -> deleteDoctor()
+    );
+
+    clearButton.addActionListener(
+            e -> clearFields()
+    );
+
+    buttonPanel.add(addButton);
+    buttonPanel.add(updateButton);
+    buttonPanel.add(deleteButton);
+    buttonPanel.add(clearButton);
+
+    card.add(buttonPanel);
 
-        textPanel.setLayout(
-                new BoxLayout(
-                        textPanel,
-                        BoxLayout.Y_AXIS
-                )
-        );
+    return card;
+}
 
+// =========================================
+// SEARCH PANEL
+// =========================================
 
-        textPanel.add(title);
+private JPanel createSearchPanel() {
 
+    JPanel card = new JPanel();
 
-        textPanel.add(
-                Box.createVerticalStrut(5)
-        );
+    card.setLayout(
+            new BoxLayout(
+                    card,
+                    BoxLayout.Y_AXIS
+            )
+    );
 
+    card.setBackground(Color.WHITE);
 
-        textPanel.add(subtitle);
+    card.setBorder(
+            BorderFactory.createCompoundBorder(
 
+                    BorderFactory.createLineBorder(
+                            new Color(
+                                    220,
+                                    225,
+                                    230
+                            )
+                    ),
 
-        header.add(
-                textPanel,
-                BorderLayout.WEST
-        );
+                    new EmptyBorder(
+                            20,
+                            20,
+                            20,
+                            20
+                    )
+            )
+    );
 
+    JLabel title =
+            new JLabel("Search Doctor");
 
-        add(
-                header,
-                BorderLayout.NORTH
-        );
-    }
+    title.setFont(
+            new Font(
+                    "Arial",
+                    Font.BOLD,
+                    20
+            )
+    );
 
+    card.add(title);
 
-    // =========================================
-    // MAIN CONTENT
-    // =========================================
+    card.add(
+            Box.createVerticalStrut(20)
+    );
 
-    private void createMainContent() {
+    card.add(
+            new JLabel("Doctor ID")
+    );
 
-        JPanel content =
-                new JPanel(
-                        new BorderLayout(
-                                20,
-                                20
-                        )
-                );
+    searchField = new JTextField();
 
+    prepareField(searchField);
 
-        content.setBackground(
-                new Color(
-                        245,
-                        247,
-                        250
-                )
-        );
+    card.add(searchField);
 
+    card.add(
+            Box.createVerticalStrut(20)
+    );
 
-        content.setBorder(
-                new EmptyBorder(
-                        20,
-                        30,
-                        30,
-                        30
-                )
-        );
+    JButton searchButton =
+            new JButton("Search Doctor");
 
+    JButton refreshButton =
+            new JButton("Refresh List");
 
-        content.add(
-                createControlSection(),
-                BorderLayout.NORTH
-        );
+    searchButton.setMaximumSize(
+            new Dimension(
+                    Integer.MAX_VALUE,
+                    40
+            )
+    );
 
+    refreshButton.setMaximumSize(
+            new Dimension(
+                    Integer.MAX_VALUE,
+                    40
+            )
+    );
 
-        content.add(
-                createTableSection(),
-                BorderLayout.CENTER
-        );
+    searchButton.addActionListener(
+            e -> searchDoctor()
+    );
 
+    refreshButton.addActionListener(
+            e -> refreshTable()
+    );
 
-        add(
-                content,
-                BorderLayout.CENTER
-        );
-    }
+    card.add(searchButton);
 
+    card.add(
+            Box.createVerticalStrut(10)
+    );
 
-    // =========================================
-    // CONTROL SECTION
-    // =========================================
+    card.add(refreshButton);
 
-    private JPanel createControlSection() {
+    return card;
+}
 
-        JPanel panel =
-                new JPanel(
-                        new GridLayout(
-                                1,
-                                2,
-                                20,
-                                0
-                        )
-                );
+// =========================================
+// DOCTOR TABLE
+// =========================================
 
+private JScrollPane createTableSection() {
 
-        panel.setBackground(
-                new Color(
-                        245,
-                        247,
-                        250
-                )
-        );
+    String[] columns = {
 
+            "Doctor ID",
+            "Doctor Name",
+            "Specialty",
+            "Department",
+            "Patients Waiting"
+    };
 
-        panel.add(
-                createDoctorForm()
-        );
+    tableModel =
+            new DefaultTableModel(
+                    columns,
+                    0
+            ) {
 
-
-        panel.add(
-                createSearchPanel()
-        );
-
-
-        return panel;
-    }
-
-
-    // =========================================
-    // ADD DOCTOR FORM
-    // =========================================
-
-    private JPanel createDoctorForm() {
-
-        JPanel card =
-                new JPanel();
-
-
-        card.setLayout(
-                new BoxLayout(
-                        card,
-                        BoxLayout.Y_AXIS
-                )
-        );
-
-
-        card.setBackground(Color.WHITE);
-
-
-        card.setBorder(
-                BorderFactory.createCompoundBorder(
-
-                        BorderFactory.createLineBorder(
-                                new Color(
-                                        220,
-                                        225,
-                                        230
-                                )
-                        ),
-
-                        new EmptyBorder(
-                                20,
-                                20,
-                                20,
-                                20
-                        )
-                )
-        );
-
-
-        JLabel title =
-                new JLabel(
-                        "Add New Doctor"
-                );
-
-
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        20
-                )
-        );
-
-
-        card.add(title);
-
-
-        card.add(
-                Box.createVerticalStrut(20)
-        );
-
-
-        // Doctor ID
-
-        card.add(
-                new JLabel(
-                        "Doctor ID"
-                )
-        );
-
-
-        idField =
-                new JTextField();
-
-
-        prepareField(idField);
-
-
-        card.add(idField);
-
-
-        card.add(
-                Box.createVerticalStrut(10)
-        );
-
-
-        // Doctor Name
-
-        card.add(
-                new JLabel(
-                        "Doctor Name"
-                )
-        );
-
-
-        nameField =
-                new JTextField();
-
-
-        prepareField(nameField);
-
-
-        card.add(nameField);
-
-
-        card.add(
-                Box.createVerticalStrut(10)
-        );
-
-        // Specialty
-
-        card.add(
-                new JLabel(
-                        "Specialty"
-                )
-        );
-
-
-        specialtyField =
-                new JTextField();
-
-
-        prepareField(
-                specialtyField
-        );
-
-
-        card.add(
-                specialtyField
-        );
-
-
-        card.add(
-                Box.createVerticalStrut(10)
-        );
-
-
-        // Department
-
-        card.add(
-                new JLabel(
-                        "Department"
-                )
-        );
-
-
-        departmentBox =
-                new JComboBox<>();
-
-
-        loadDepartments();
-
-
-        departmentBox.setMaximumSize(
-
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        35
-                )
-        );
-
-
-        card.add(departmentBox);
-
-
-        card.add(
-                Box.createVerticalStrut(20)
-        );
-
-
-        JPanel buttonPanel =
-                new JPanel(
-                        new GridLayout(
-                                2,
-                                2,
-                                10,
-                                10
-                        )
-                );
-
-
-        buttonPanel.setBackground(Color.WHITE);
-
-
-        JButton addButton =
-                new JButton(
-                        "Add Doctor"
-                );
-
-        JButton updateButton =
-                new JButton(
-                        "Update Doctor"
-                );
-
-        JButton deleteButton =
-                new JButton(
-                        "Delete Doctor"
-                );
-
-
-        JButton clearButton =
-                new JButton(
-                        "Clear"
-                );
-                
-
-
-        addButton.addActionListener(
-        e -> addDoctor()
-        );
-
-        updateButton.addActionListener(
-                e -> updateDoctor()
-        );
-
-        deleteButton.addActionListener(
-                e -> deleteDoctor()
-        );
-
-        clearButton.addActionListener(
-                e -> clearFields()
-        );
-
-
-        buttonPanel.add(addButton);
-
-        buttonPanel.add(updateButton);
-
-        buttonPanel.add(deleteButton);
-
-        buttonPanel.add(clearButton);
-
-
-        card.add(buttonPanel);
-
-
-        return card;
-    }
-
-
-    // =========================================
-    // SEARCH PANEL
-    // =========================================
-
-    private JPanel createSearchPanel() {
-
-        JPanel card =
-                new JPanel();
-
-
-        card.setLayout(
-                new BoxLayout(
-                        card,
-                        BoxLayout.Y_AXIS
-                )
-        );
-
-
-        card.setBackground(Color.WHITE);
-
-
-        card.setBorder(
-                BorderFactory.createCompoundBorder(
-
-                        BorderFactory.createLineBorder(
-                                new Color(
-                                        220,
-                                        225,
-                                        230
-                                )
-                        ),
-
-                        new EmptyBorder(
-                                20,
-                                20,
-                                20,
-                                20
-                        )
-                )
-        );
-
-
-        JLabel title =
-                new JLabel(
-                        "Search Doctor"
-                );
-
-
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        20
-                )
-        );
-
-
-        card.add(title);
-
-
-        card.add(
-                Box.createVerticalStrut(20)
-        );
-
-
-        card.add(
-                new JLabel(
-                        "Doctor ID"
-                )
-        );
-
-
-        searchField =
-                new JTextField();
-
-
-        prepareField(searchField);
-
-
-        card.add(searchField);
-
-
-        card.add(
-                Box.createVerticalStrut(20)
-        );
-
-
-        JButton searchButton =
-                new JButton(
-                        "Search Doctor"
-                );
-
-
-        JButton refreshButton =
-                new JButton(
-                        "Refresh List"
-                );
-
-
-        searchButton.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        40
-                )
-        );
-
-
-        refreshButton.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        40
-                )
-        );
-
-
-        searchButton.addActionListener(
-                e -> searchDoctor()
-        );
-
-
-        refreshButton.addActionListener(
-                e -> refreshTable()
-        );
-
-
-        card.add(searchButton);
-
-
-        card.add(
-                Box.createVerticalStrut(10)
-        );
-
-
-        card.add(refreshButton);
-
-
-        return card;
-    }
-
-
-    // =========================================
-    // DOCTOR TABLE
-    // =========================================
-
-    private JScrollPane createTableSection() {
-
-        String[] columns = {
-
-                "Doctor ID",
-
-                "Doctor Name",
-                
-                "Specialty",
-
-                "Department",
-
-                "Patients Waiting"
-        };
-
-
-        tableModel =
-                new DefaultTableModel(
-                        columns,
-                        0
+                @Override
+                public boolean isCellEditable(
+                        int row,
+                        int column
                 ) {
 
-                    @Override
-                    public boolean isCellEditable(
-                            int row,
-                            int column
-                    ) {
+                    return false;
+                }
+            };
 
-                        return false;
-                    }
-                };
+    doctorTable =
+            new JTable(tableModel);
 
+    doctorTable.setRowHeight(32);
 
-        doctorTable =
-                new JTable(tableModel);
+    doctorTable.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION
+    );
 
+    doctorTable.getTableHeader()
+            .setFont(
+                    new Font(
+                            "Arial",
+                            Font.BOLD,
+                            14
+                    )
+            );
 
-        doctorTable.setRowHeight(32);
+    doctorTable.getSelectionModel()
+            .addListSelectionListener(e -> {
 
+                if (!e.getValueIsAdjusting()) {
 
-        doctorTable.setSelectionMode(
-                ListSelectionModel.SINGLE_SELECTION
-        );
+                    loadSelectedDoctor();
+                }
+            });
 
+    JScrollPane scrollPane =
+            new JScrollPane(
+                    doctorTable
+            );
 
-        doctorTable.getTableHeader()
-                .setFont(
-                        new Font(
-                                "Arial",
-                                Font.BOLD,
-                                14
-                        )
-                );
+    scrollPane.setBorder(
+            BorderFactory.createTitledBorder(
+                    "Hospital Doctors"
+            )
+    );
 
+    return scrollPane;
+}
 
-        doctorTable.getSelectionModel()
-                .addListSelectionListener(e -> {
+// =========================================
+// LOAD DEPARTMENTS
+// =========================================
 
-                    if (!e.getValueIsAdjusting()) {
+private void loadDepartments() {
 
-                        loadSelectedDoctor();
-                    }
-                });
+    List<Department> departments =
+            HospitalData.getDepartments();
 
+    for (Department department : departments) {
 
-        JScrollPane scrollPane =
-                new JScrollPane(
-                        doctorTable
-                );
-
-
-        scrollPane.setBorder(
-                BorderFactory.createTitledBorder(
-                        "Hospital Doctors"
-                )
-        );
-
-
-        return scrollPane;
-    }
-
-
-    // =========================================
-    // LOAD DEPARTMENTS
-    // =========================================
-
-    private void loadDepartments() {
-
-        List<Department> departments =
-                HospitalData.getDepartments();
-
-
-        for (Department department : departments) {
+        if (department != null) {
 
             departmentBox.addItem(
                     department.getName()
             );
         }
     }
+}
 
+// =========================================
+// ADD DOCTOR
+// =========================================
 
-    // =========================================
-    // ADD DOCTOR
-    // =========================================
+private void addDoctor() {
 
-    private void addDoctor() {
+    String id =
+            idField.getText().trim();
 
-        String id =
-                idField.getText().trim();
+    String name =
+            nameField.getText().trim();
 
+    String specialty =
+            specialtyField.getText().trim();
 
-        String name =
-                nameField.getText().trim();
+    String departmentName =
+            (String) departmentBox.getSelectedItem();
 
-        String specialty =
-                specialtyField.getText().trim();        
+    if (
+            id.isEmpty()
+                    || name.isEmpty()
+                    || specialty.isEmpty()
+    ) {
 
+        showMessage(
+                "Doctor ID, Name, and Specialty are required.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
 
-        String departmentName =
-                (String)
-                        departmentBox.getSelectedItem();
-
-
-        if (
-                id.isEmpty() || name.isEmpty() || specialty.isEmpty()) {
-
-            showMessage(
-                    "Doctor ID, Name, and Specialty are required.",
-                    "Missing Information",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Doctor existingDoctor =
-                doctorRegistry.get(id);
-
-
-        if (existingDoctor != null) {
-
-            showMessage(
-                    "A doctor with this ID already exists.",
-                    "Duplicate Doctor",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Department selectedDepartment =
-                findDepartment(
-                        departmentName
-                );
-
-
-        if (selectedDepartment == null) {
-
-            showMessage(
-                    "Department not found.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Doctor doctor =
-                new Doctor(
-                        id,
-                        name,
-                        specialty,
-                        selectedDepartment
-                );
-
-
-        doctorRegistry.put(
-        doctor.getId(),
-        doctor
-);
-
-        boolean success =
-                doctorRegistry.get(doctor.getId()) != null;
-
-
-        if (success) {
-
-            refreshTable();
-
-            clearFields();
-
-
-            showMessage(
-                    "Doctor added successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-        }
-
-        else {
-
-            showMessage(
-                    "Could not add doctor.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
+        return;
     }
 
+    if (departmentName == null
+            || departmentName.trim().isEmpty()) {
 
-    // =========================================
-    // SEARCH DOCTOR
-    // =========================================
-
-    private void searchDoctor() {
-
-        String id =
-                searchField.getText().trim();
-
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Please enter a Doctor ID.",
-                    "Search",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Doctor doctor =
-                doctorRegistry.get(id);
-
-
-        if (doctor == null) {
-
-            showMessage(
-                    "Doctor not found.",
-                    "Search Result",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            return;
-        }
-
-
-        idField.setText(
-                doctor.getId()
+        showMessage(
+                "Please select a department.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
         );
 
+        return;
+    }
 
-        nameField.setText(
-                doctor.getName()
+    Doctor existingDoctor =
+            doctorRegistry.get(id);
+
+    if (existingDoctor != null) {
+
+        showMessage(
+                "A doctor with this ID already exists.",
+                "Duplicate Doctor",
+                JOptionPane.ERROR_MESSAGE
         );
 
+        return;
+    }
+
+    Department selectedDepartment =
+            findDepartment(departmentName);
+
+    if (selectedDepartment == null) {
+
+        showMessage(
+                "Department not found.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    Doctor doctor =
+            new Doctor(
+                    id,
+                    name,
+                    specialty,
+                    selectedDepartment
+            );
+
+    doctorRegistry.put(
+            doctor.getId(),
+            doctor
+    );
+
+    boolean success =
+            doctorRegistry.get(
+                    doctor.getId()
+            ) != null;
+
+    if (success) {
+
+        refreshTable();
+
+        clearFields();
+
+        showMessage(
+                "Doctor added successfully!",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+    } else {
+
+        showMessage(
+                "Could not add doctor.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+}
+
+// =========================================
+// SEARCH DOCTOR
+// =========================================
+
+private void searchDoctor() {
+
+    String id =
+            searchField.getText().trim();
+
+    if (id.isEmpty()) {
+
+        showMessage(
+                "Please enter a Doctor ID.",
+                "Search",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    Doctor doctor =
+            doctorRegistry.get(id);
+
+    if (doctor == null) {
+
+        showMessage(
+                "Doctor not found.",
+                "Search Result",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        return;
+    }
+
+    idField.setText(
+            doctor.getId()
+    );
+
+    nameField.setText(
+            doctor.getName()
+    );
+
+    specialtyField.setText(
+            doctor.getSpecialty()
+    );
+
+    if (doctor.getDepartment() != null) {
 
         departmentBox.setSelectedItem(
                 doctor.getDepartment().getName()
         );
+    }
 
+    highlightDoctor(
+            doctor.getId()
+    );
 
-        highlightDoctor(
-                doctor.getId()
+    String departmentName =
+            doctor.getDepartment() != null
+                    ? doctor.getDepartment().getName()
+                    : "Not assigned";
+
+    showMessage(
+            "Doctor found!\n\n"
+                    + "Name: "
+                    + doctor.getName()
+                    + "\nID: "
+                    + doctor.getId()
+                    + "\nSpecialty: "
+                    + doctor.getSpecialty()
+                    + "\nDepartment: "
+                    + departmentName
+                    + "\nPatients Waiting: "
+                    + doctor.getQueueSize(),
+
+            "Doctor Details",
+
+            JOptionPane.INFORMATION_MESSAGE
+    );
+}
+
+// =========================================
+// REFRESH TABLE
+// =========================================
+
+private void refreshTable() {
+
+    if (tableModel == null) {
+        return;
+    }
+
+    tableModel.setRowCount(0);
+
+    List<Doctor> doctors =
+            doctorRegistry.getAllValues();
+
+    if (doctors == null) {
+        return;
+    }
+
+    for (Doctor doctor : doctors) {
+
+        if (doctor == null) {
+            continue;
+        }
+
+        String departmentName =
+                doctor.getDepartment() != null
+                        ? doctor.getDepartment().getName()
+                        : "Not assigned";
+
+        tableModel.addRow(
+                new Object[]{
+
+                        doctor.getId(),
+
+                        doctor.getName(),
+
+                        doctor.getSpecialty(),
+
+                        departmentName,
+
+                        doctor.getQueueSize()
+                }
         );
+    }
+}
 
+// =========================================
+// SELECT DOCTOR
+// =========================================
 
-        showMessage(
-                "Doctor found!\n\n"
+private void loadSelectedDoctor() {
 
-                        + "Name: "
-                        + doctor.getName()
+    int row =
+            doctorTable.getSelectedRow();
 
-                        + "\nID: "
-                        + doctor.getId()
+    if (row == -1) {
+        return;
+    }
 
-                        + "\nSpecialty: "
-                        + doctor.getSpecialty()
+    int modelRow =
+            doctorTable.convertRowIndexToModel(row);
 
-                        + "\nDepartment: "
-                        + doctor.getDepartment().getName()
+    String id =
+            tableModel
+                    .getValueAt(
+                            modelRow,
+                            0
+                    )
+                    .toString();
 
-                        + "\nPatients Waiting: "
-                        + doctor.getQueueSize(),
+    Doctor doctor =
+            doctorRegistry.get(id);
 
-                "Doctor Details",
+    if (doctor == null) {
+        return;
+    }
 
-                JOptionPane.INFORMATION_MESSAGE
+    idField.setText(
+            doctor.getId()
+    );
+
+    nameField.setText(
+            doctor.getName()
+    );
+
+    specialtyField.setText(
+            doctor.getSpecialty()
+    );
+
+    if (doctor.getDepartment() != null) {
+
+        departmentBox.setSelectedItem(
+                doctor.getDepartment().getName()
         );
     }
 
+    searchField.setText(
+            doctor.getId()
+    );
+}
 
-    // =========================================
-    // REFRESH TABLE
-    // =========================================
+// =========================================
+// FIND DEPARTMENT
+// =========================================
 
-    private void refreshTable() {
+private Department findDepartment(
+        String name
+) {
 
-        tableModel.setRowCount(0);
-
-
-        List<Doctor> doctors =
-                doctorRegistry.getAllValues();
-
-
-        for (Doctor doctor : doctors) {
-
-            tableModel.addRow(
-
-                    new Object[]{
-
-                            doctor.getId(),
-
-                            doctor.getName(),
-
-                            doctor.getSpecialty(),
-
-                            doctor.getDepartment().getName(),
-
-                            doctor.getQueueSize()
-                    }
-            );
-        }
-    }
-
-
-    // =========================================
-    // SELECT DOCTOR
-    // =========================================
-
-    private void loadSelectedDoctor() {
-
-        int row =
-                doctorTable.getSelectedRow();
-
-
-        if (row == -1) {
-
-            return;
-        }
-
-
-        String id =
-                tableModel
-                        .getValueAt(
-                                row,
-                                0
-                        )
-                        .toString();
-
-
-        Doctor doctor =
-                doctorRegistry.get(id);
-
-
-        if (doctor != null) {
-
-            idField.setText(
-                    doctor.getId()
-            );
-
-
-            nameField.setText(
-                    doctor.getName()
-            );
-
-            specialtyField.setText(
-                    doctor.getSpecialty()
-            );
-
-
-            departmentBox.setSelectedItem(
-                    doctor
-                            .getDepartment()
-                            .getName()
-            );
-
-
-            searchField.setText(
-                    doctor.getId()
-            );
-        }
-    }
-
-
-    // =========================================
-    // FIND DEPARTMENT
-    // =========================================
-
-    private Department findDepartment(
-            String name
-    ) {
-
-        for (
-                Department department :
-                HospitalData.getDepartments()
-        ) {
-
-            if (
-                    department.getName()
-                            .equalsIgnoreCase(name)
-            ) {
-
-                return department;
-            }
-        }
-
-
+    if (name == null) {
         return null;
     }
 
-
-    // =========================================
-    // HIGHLIGHT DOCTOR
-    // =========================================
-
-    private void highlightDoctor(
-            String doctorId
+    for (
+            Department department :
+            HospitalData.getDepartments()
     ) {
 
-        for (
-                int i = 0;
-
-                i < tableModel.getRowCount();
-
-                i++
+        if (
+                department != null
+                        && department.getName() != null
+                        && department.getName()
+                        .equalsIgnoreCase(name)
         ) {
 
-            String id =
-                    tableModel
-                            .getValueAt(i, 0)
-                            .toString();
-
-
-            if (
-                    id.equals(doctorId)
-            ) {
-
-                doctorTable.setRowSelectionInterval(
-                        i,
-                        i
-                );
-
-
-                break;
-            }
+            return department;
         }
     }
 
-        // =========================================
-        // UPDATE DOCTOR
-        // =========================================
+    return null;
+}
 
-        private void updateDoctor() {
+// =========================================
+// HIGHLIGHT DOCTOR
+// =========================================
 
-        String id =
-                idField.getText().trim();
+private void highlightDoctor(
+        String doctorId
+) {
 
+    if (doctorId == null) {
+        return;
+    }
 
-        String name =
-                nameField.getText().trim();
+    for (
+            int i = 0;
+            i < tableModel.getRowCount();
+            i++
+    ) {
 
+        Object value =
+                tableModel.getValueAt(i, 0);
 
-        String specialty =
-                specialtyField.getText().trim();
+        if (value != null
+                && value.toString()
+                .equals(doctorId)) {
 
+            doctorTable.setRowSelectionInterval(
+                    i,
+                    i
+            );
 
-        String departmentName =
-                (String) departmentBox.getSelectedItem();
+            doctorTable.scrollRectToVisible(
+                    doctorTable
+                            .getCellRect(
+                                    i,
+                                    0,
+                                    true
+                            )
+            );
 
-
-        // Check Doctor ID
-
-        if (id.isEmpty()) {
-
-                showMessage(
-                        "Please select or search for a doctor first.",
-                        "Update Doctor",
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-                return;
+            break;
         }
+    }
+}
 
+// =========================================
+// UPDATE DOCTOR
+// =========================================
 
-        // Check required fields
+private void updateDoctor() {
 
-        if (
-                name.isEmpty()
-                || specialty.isEmpty()
-        ) {
+    String id =
+            idField.getText().trim();
 
-                showMessage(
-                        "Doctor Name and Specialty are required.",
-                        "Missing Information",
-                        JOptionPane.WARNING_MESSAGE
-                );
+    String name =
+            nameField.getText().trim();
 
-                return;
-        }
+    String specialty =
+            specialtyField.getText().trim();
 
+    String departmentName =
+            (String) departmentBox.getSelectedItem();
 
-        // Find doctor
+    // Check Doctor ID
 
-        Doctor doctor =
-                doctorRegistry.get(id);
-
-
-        if (doctor == null) {
-
-                showMessage(
-                        "Doctor not found.",
-                        "Update Doctor",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-        }
-
-
-        // Find selected department
-
-        Department selectedDepartment =
-                findDepartment(departmentName);
-
-
-        if (selectedDepartment == null) {
-
-                showMessage(
-                        "Department not found.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-        }
-
-
-        // Update doctor information
-
-        doctor.setName(name);
-
-        doctor.setSpecialty(specialty);
-
-        doctor.setDepartment(selectedDepartment);
-
-
-        refreshTable();
-
-
-        highlightDoctor(id);
-
+    if (id.isEmpty()) {
 
         showMessage(
-                "Doctor information updated successfully!",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE
+                "Please select or search for a doctor first.",
+                "Update Doctor",
+                JOptionPane.WARNING_MESSAGE
         );
+
+        return;
+    }
+
+    // Check required fields
+
+    if (
+            name.isEmpty()
+                    || specialty.isEmpty()
+    ) {
+
+        showMessage(
+                "Doctor Name and Specialty are required.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    // Check department
+
+    if (departmentName == null
+            || departmentName.trim().isEmpty()) {
+
+        showMessage(
+                "Please select a department.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    // Find doctor
+
+    Doctor doctor =
+            doctorRegistry.get(id);
+
+    if (doctor == null) {
+
+        showMessage(
+                "Doctor not found.",
+                "Update Doctor",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    // Find selected department
+
+    Department selectedDepartment =
+            findDepartment(departmentName);
+
+    if (selectedDepartment == null) {
+
+        showMessage(
+                "Department not found.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    // Update doctor information
+
+    doctor.setName(name);
+
+    doctor.setSpecialty(specialty);
+
+    doctor.setDepartment(
+            selectedDepartment
+    );
+
+    refreshTable();
+
+    highlightDoctor(id);
+
+    showMessage(
+            "Doctor information updated successfully!",
+            "Success",
+            JOptionPane.INFORMATION_MESSAGE
+    );
+}
+
+// =========================================
+// DELETE DOCTOR
+// =========================================
+
+private void deleteDoctor() {
+
+    String id =
+            idField.getText().trim();
+
+    if (id.isEmpty()) {
+
+        showMessage(
+                "Please select or search for a doctor first.",
+                "Delete Doctor",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    Doctor doctor =
+            doctorRegistry.get(id);
+
+    if (doctor == null) {
+
+        showMessage(
+                "Doctor not found.",
+                "Delete Doctor",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    String departmentName =
+            doctor.getDepartment() != null
+                    ? doctor.getDepartment().getName()
+                    : "Not assigned";
+
+    int confirmation =
+            JOptionPane.showConfirmDialog(
+                    this,
+
+                    "Are you sure you want to remove this doctor?\n\n"
+                            + "Doctor: "
+                            + doctor.getName()
+                            + "\nID: "
+                            + doctor.getId()
+                            + "\nDepartment: "
+                            + departmentName,
+
+                    "Confirm Doctor Removal",
+
+                    JOptionPane.YES_NO_OPTION,
+
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+    if (
+            confirmation != JOptionPane.YES_OPTION
+    ) {
+
+        return;
+    }
+
+    Doctor removed =
+            doctorRegistry.remove(id);
+
+    if (removed != null) {
+
+        if (removed.getDepartment() != null) {
+
+            removed.getDepartment()
+                    .removeDoctor();
         }
-
-        // =========================================
-        // DELETE DOCTOR
-        // =========================================
-
-        private void deleteDoctor() {
-
-        String id = idField.getText().trim();
-
-        if (id.isEmpty()) {
-
-                showMessage(
-                        "Please select or search for a doctor first.",
-                        "Delete Doctor",
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-                return;
-        }
-
-        Doctor doctor = doctorRegistry.get(id);
-
-        if (doctor == null) {
-
-                showMessage(
-                        "Doctor not found.",
-                        "Delete Doctor",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-        }
-
-        int confirmation =
-                JOptionPane.showConfirmDialog(
-                        this,
-
-                        "Are you sure you want to remove this doctor?\n\n"
-                                + "Doctor: "
-                                + doctor.getName()
-                                + "\nID: "
-                                + doctor.getId()
-                                + "\nDepartment: "
-                                + doctor.getDepartment().getName(),
-
-                        "Confirm Doctor Removal",
-
-                        JOptionPane.YES_NO_OPTION,
-
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-        if (confirmation != JOptionPane.YES_OPTION) {
-                return;
-        }
-
-        Doctor removed =
-                doctorRegistry.remove(id);
-
-        if (removed != null) {
-
-        removed.getDepartment().removeDoctor();
 
         refreshTable();
 
@@ -1268,77 +1137,78 @@ public class DoctorPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        } else {
+    } else {
 
         showMessage(
                 "Could not remove doctor.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE
         );
-        }
+    }
 }
 
-    // =========================================
-    // CLEAR
-    // =========================================
+// =========================================
+// CLEAR
+// =========================================
 
-    private void clearFields() {
+private void clearFields() {
 
-        idField.setText("");
+    idField.setText("");
 
-        nameField.setText("");
+    nameField.setText("");
 
-        specialtyField.setText("");
+    specialtyField.setText("");
 
+    searchField.setText("");
 
-        if (
-                departmentBox.getItemCount() > 0
-        ) {
+    doctorTable.clearSelection();
 
-            departmentBox.setSelectedIndex(0);
-        }
-    }
-
-
-    // =========================================
-    // HELPERS
-    // =========================================
-
-    private void prepareField(
-            JTextField field
+    if (
+            departmentBox.getItemCount() > 0
     ) {
 
-        field.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        35
-                )
-        );
+        departmentBox.setSelectedIndex(0);
     }
+}
+
+// =========================================
+// HELPERS
+// =========================================
+
+private void prepareField(
+        JTextField field
+) {
+
+    field.setMaximumSize(
+            new Dimension(
+                    Integer.MAX_VALUE,
+                    35
+            )
+    );
+}
+
+private void showMessage(
+        String message,
+        String title,
+        int type
+) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            message,
+            title,
+            type
+    );
+}
+
+// =========================================
+// PUBLIC REFRESH
+// =========================================
+
+public void refresh() {
+
+    refreshTable();
+}
 
 
-    private void showMessage(
-
-            String message,
-
-            String title,
-
-            int type
-    ) {
-
-        JOptionPane.showMessageDialog(
-
-                this,
-
-                message,
-
-                title,
-
-                type
-        );
-    }
-
-  public void refresh(){
-        refreshTable();
-  } 
 }

@@ -26,10 +26,10 @@ public class PatientPanel extends JPanel {
 
     private RecordRegistry patientRegistry;
 
-
     public PatientPanel() {
 
-        patientRegistry = HospitalData.getPatientRegistry();
+        patientRegistry =
+                HospitalData.getPatientRegistry();
 
         setLayout(new BorderLayout());
 
@@ -42,14 +42,14 @@ public class PatientPanel extends JPanel {
         refreshTable();
     }
 
-
     // =========================================
     // HEADER
     // =========================================
 
     private void createHeader() {
 
-        JPanel header = new JPanel(new BorderLayout());
+        JPanel header =
+                new JPanel(new BorderLayout());
 
         header.setBackground(Color.WHITE);
 
@@ -57,14 +57,12 @@ public class PatientPanel extends JPanel {
                 new EmptyBorder(25, 30, 15, 30)
         );
 
-
         JLabel title =
                 new JLabel("Patient Management");
 
         title.setFont(
                 new Font("Arial", Font.BOLD, 30)
         );
-
 
         JLabel subtitle =
                 new JLabel(
@@ -77,15 +75,17 @@ public class PatientPanel extends JPanel {
 
         subtitle.setForeground(Color.GRAY);
 
-
-        JPanel textPanel = new JPanel();
+        JPanel textPanel =
+                new JPanel();
 
         textPanel.setBackground(Color.WHITE);
 
         textPanel.setLayout(
-                new BoxLayout(textPanel, BoxLayout.Y_AXIS)
+                new BoxLayout(
+                        textPanel,
+                        BoxLayout.Y_AXIS
+                )
         );
-
 
         textPanel.add(title);
 
@@ -95,16 +95,16 @@ public class PatientPanel extends JPanel {
 
         textPanel.add(subtitle);
 
-
         header.add(
                 textPanel,
                 BorderLayout.WEST
         );
 
-
-        add(header, BorderLayout.NORTH);
+        add(
+                header,
+                BorderLayout.NORTH
+        );
     }
-
 
     // =========================================
     // MAIN CONTENT
@@ -112,34 +112,39 @@ public class PatientPanel extends JPanel {
 
     private void createMainContent() {
 
-        JPanel content = new JPanel(
-                new BorderLayout(20, 20)
-        );
+        JPanel content =
+                new JPanel(
+                        new BorderLayout(20, 20)
+                );
 
         content.setBackground(
                 new Color(245, 247, 250)
         );
 
         content.setBorder(
-                new EmptyBorder(20, 30, 30, 30)
+                new EmptyBorder(
+                        20,
+                        30,
+                        30,
+                        30
+                )
         );
-
 
         content.add(
                 createControlSection(),
                 BorderLayout.NORTH
         );
 
-
         content.add(
                 createTableSection(),
                 BorderLayout.CENTER
         );
 
-
-        add(content, BorderLayout.CENTER);
+        add(
+                content,
+                BorderLayout.CENTER
+        );
     }
-
 
     // =========================================
     // TOP CONTROL SECTION
@@ -147,14 +152,19 @@ public class PatientPanel extends JPanel {
 
     private JPanel createControlSection() {
 
-        JPanel panel = new JPanel(
-                new GridLayout(1, 2, 20, 0)
-        );
+        JPanel panel =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                2,
+                                20,
+                                0
+                        )
+                );
 
         panel.setBackground(
                 new Color(245, 247, 250)
         );
-
 
         panel.add(
                 createPatientForm()
@@ -164,10 +174,8 @@ public class PatientPanel extends JPanel {
                 createSearchPanel()
         );
 
-
         return panel;
     }
-
 
     // =========================================
     // PATIENT FORM
@@ -175,157 +183,14 @@ public class PatientPanel extends JPanel {
 
     private JPanel createPatientForm() {
 
-    JPanel card = new JPanel();
-
-    card.setLayout(
-            new BoxLayout(card, BoxLayout.Y_AXIS)
-    );
-
-    card.setBackground(Color.WHITE);
-
-    card.setBorder(
-            createCardBorder()
-    );
-
-    JLabel title =
-            new JLabel("Patient Information");
-
-    title.setFont(
-            new Font("Arial", Font.BOLD, 20)
-    );
-
-    card.add(title);
-
-    card.add(
-            Box.createVerticalStrut(15)
-    );
-
-    // ID
-    card.add(new JLabel("Patient ID"));
-
-    idField = new JTextField();
-
-    prepareTextField(idField);
-
-    card.add(idField);
-
-    card.add(
-            Box.createVerticalStrut(8)
-    );
-
-    // NAME
-    card.add(new JLabel("Patient Name"));
-
-    nameField = new JTextField();
-
-    prepareTextField(nameField);
-
-    card.add(nameField);
-
-    card.add(
-            Box.createVerticalStrut(8)
-    );
-
-    // AGE
-    card.add(new JLabel("Age"));
-
-    ageField = new JTextField();
-
-    prepareTextField(ageField);
-
-    card.add(ageField);
-
-    card.add(
-            Box.createVerticalStrut(8)
-    );
-
-    // GENDER
-    card.add(new JLabel("Gender"));
-
-    genderField = new JTextField();
-
-    prepareTextField(genderField);
-
-    card.add(genderField);
-
-    card.add(
-            Box.createVerticalStrut(8)
-    );
-
-    // PHONE
-    card.add(new JLabel("Phone"));
-
-    phoneField = new JTextField();
-
-    prepareTextField(phoneField);
-
-    card.add(phoneField);
-
-    card.add(
-            Box.createVerticalStrut(8)
-    );
-
-    // SEVERITY
-    card.add(new JLabel("Severity (1-10)"));
-
-    severityField = new JTextField();
-
-    prepareTextField(severityField);
-
-    card.add(severityField);
-
-    card.add(
-            Box.createVerticalStrut(15)
-    );
-
-    JPanel buttonPanel =
-            new JPanel(
-                    new GridLayout(1, 3, 10, 0)
-            );
-
-    buttonPanel.setBackground(Color.WHITE);
-
-    JButton addButton =
-            new JButton("Add");
-
-    JButton updateButton =
-            new JButton("Update");
-
-    JButton clearButton =
-            new JButton("Clear");
-
-    addButton.addActionListener(
-            e -> addPatient()
-    );
-
-    updateButton.addActionListener(
-            e -> updatePatient()
-    );
-
-    clearButton.addActionListener(
-            e -> clearFields()
-    );
-
-    buttonPanel.add(addButton);
-    buttonPanel.add(updateButton);
-    buttonPanel.add(clearButton);
-
-    card.add(buttonPanel);
-
-    return card;
-}
-
-
-    // =========================================
-    // SEARCH PANEL
-    // =========================================
-
-    private JPanel createSearchPanel() {
-
-        JPanel card = new JPanel();
+        JPanel card =
+                new JPanel();
 
         card.setLayout(
-                new BoxLayout(card, BoxLayout.Y_AXIS)
+                new BoxLayout(
+                        card,
+                        BoxLayout.Y_AXIS
+                )
         );
 
         card.setBackground(Color.WHITE);
@@ -334,14 +199,195 @@ public class PatientPanel extends JPanel {
                 createCardBorder()
         );
 
+        JLabel title =
+                new JLabel("Patient Information");
+
+        title.setFont(
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        20
+                )
+        );
+
+        card.add(title);
+
+        card.add(
+                Box.createVerticalStrut(15)
+        );
+
+        // ID
+        card.add(
+                new JLabel("Patient ID")
+        );
+
+        idField =
+                new JTextField();
+
+        prepareTextField(idField);
+
+        card.add(idField);
+
+        card.add(
+                Box.createVerticalStrut(8)
+        );
+
+        // NAME
+        card.add(
+                new JLabel("Patient Name")
+        );
+
+        nameField =
+                new JTextField();
+
+        prepareTextField(nameField);
+
+        card.add(nameField);
+
+        card.add(
+                Box.createVerticalStrut(8)
+        );
+
+        // AGE
+        card.add(
+                new JLabel("Age")
+        );
+
+        ageField =
+                new JTextField();
+
+        prepareTextField(ageField);
+
+        card.add(ageField);
+
+        card.add(
+                Box.createVerticalStrut(8)
+        );
+
+        // GENDER
+        card.add(
+                new JLabel("Gender")
+        );
+
+        genderField =
+                new JTextField();
+
+        prepareTextField(genderField);
+
+        card.add(genderField);
+
+        card.add(
+                Box.createVerticalStrut(8)
+        );
+
+        // PHONE
+        card.add(
+                new JLabel("Phone")
+        );
+
+        phoneField =
+                new JTextField();
+
+        prepareTextField(phoneField);
+
+        card.add(phoneField);
+
+        card.add(
+                Box.createVerticalStrut(8)
+        );
+
+        // SEVERITY
+        card.add(
+                new JLabel("Severity (1-10)")
+        );
+
+        severityField =
+                new JTextField();
+
+        prepareTextField(severityField);
+
+        severityField.setText("1");
+
+        card.add(severityField);
+
+        card.add(
+                Box.createVerticalStrut(15)
+        );
+
+        JPanel buttonPanel =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                3,
+                                10,
+                                0
+                        )
+                );
+
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton addButton =
+                new JButton("Add");
+
+        JButton updateButton =
+                new JButton("Update");
+
+        JButton clearButton =
+                new JButton("Clear");
+
+        addButton.addActionListener(
+                e -> addPatient()
+        );
+
+        updateButton.addActionListener(
+                e -> updatePatient()
+        );
+
+        clearButton.addActionListener(
+                e -> clearFields()
+        );
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(clearButton);
+
+        card.add(buttonPanel);
+
+        return card;
+    }
+
+    // =========================================
+    // SEARCH PANEL
+    // =========================================
+
+    private JPanel createSearchPanel() {
+
+        JPanel card =
+                new JPanel();
+
+        card.setLayout(
+                new BoxLayout(
+                        card,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+        card.setBackground(Color.WHITE);
+
+        card.setBorder(
+                createCardBorder()
+        );
 
         JLabel title =
                 new JLabel("Search & Actions");
 
         title.setFont(
-                new Font("Arial", Font.BOLD, 20)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        20
+                )
         );
-
 
         card.add(title);
 
@@ -349,23 +395,20 @@ public class PatientPanel extends JPanel {
                 Box.createVerticalStrut(20)
         );
 
-
         card.add(
                 new JLabel("Patient ID")
         );
 
-
-        searchField = new JTextField();
+        searchField =
+                new JTextField();
 
         prepareTextField(searchField);
 
         card.add(searchField);
 
-
         card.add(
                 Box.createVerticalStrut(20)
         );
-
 
         JButton searchButton =
                 new JButton("Search Patient");
@@ -375,7 +418,6 @@ public class PatientPanel extends JPanel {
 
         JButton refreshButton =
                 new JButton("Refresh List");
-
 
         searchButton.setMaximumSize(
                 new Dimension(
@@ -398,7 +440,6 @@ public class PatientPanel extends JPanel {
                 )
         );
 
-
         searchButton.addActionListener(
                 e -> searchPatient()
         );
@@ -408,9 +449,12 @@ public class PatientPanel extends JPanel {
         );
 
         refreshButton.addActionListener(
-                e -> refreshTable()
+                e -> {
+                    refreshTable();
+                    clearFields();
+                    searchField.setText("");
+                }
         );
-
 
         card.add(searchButton);
 
@@ -426,10 +470,8 @@ public class PatientPanel extends JPanel {
 
         card.add(refreshButton);
 
-
         return card;
     }
-
 
     // =========================================
     // TABLE
@@ -438,7 +480,6 @@ public class PatientPanel extends JPanel {
     private JScrollPane createTableSection() {
 
         String[] columns = {
-
                 "Patient ID",
                 "Patient Name",
                 "Age",
@@ -446,7 +487,6 @@ public class PatientPanel extends JPanel {
                 "Phone",
                 "Severity"
         };
-
 
         tableModel =
                 new DefaultTableModel(
@@ -459,15 +499,12 @@ public class PatientPanel extends JPanel {
                             int row,
                             int column
                     ) {
-
                         return false;
                     }
                 };
 
-
         patientTable =
                 new JTable(tableModel);
-
 
         patientTable.setRowHeight(32);
 
@@ -479,34 +516,31 @@ public class PatientPanel extends JPanel {
                 )
         );
 
-
-        patientTable.getTableHeader().setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        14
-                )
-        );
-
+        patientTable.getTableHeader()
+                .setFont(
+                        new Font(
+                                "Arial",
+                                Font.BOLD,
+                                14
+                        )
+                );
 
         patientTable.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
         );
 
-
         patientTable.getSelectionModel()
                 .addListSelectionListener(e -> {
 
                     if (!e.getValueIsAdjusting()) {
-
                         loadSelectedPatient();
                     }
                 });
 
-
         JScrollPane scrollPane =
-                new JScrollPane(patientTable);
-
+                new JScrollPane(
+                        patientTable
+                );
 
         scrollPane.setBorder(
                 BorderFactory.createTitledBorder(
@@ -514,10 +548,8 @@ public class PatientPanel extends JPanel {
                 )
         );
 
-
         return scrollPane;
     }
-
 
     // =========================================
     // ADD PATIENT
@@ -525,137 +557,162 @@ public class PatientPanel extends JPanel {
 
     private void addPatient() {
 
-    String id = idField.getText().trim();
-    String name = nameField.getText().trim();
-    String ageText = ageField.getText().trim();
-    String gender = genderField.getText().trim();
-    String phone = phoneField.getText().trim();
-    String severityText = severityField.getText().trim();
+        String id =
+                idField.getText().trim();
 
-    if (id.isEmpty() || name.isEmpty()) {
+        String name =
+                nameField.getText().trim();
 
-        showMessage(
-                "Patient ID and Name are required.",
-                "Missing Information",
-                JOptionPane.WARNING_MESSAGE
-        );
+        String ageText =
+                ageField.getText().trim();
 
-        return;
-    }
+        String gender =
+                genderField.getText().trim();
 
-    int age;
+        String phone =
+                phoneField.getText().trim();
 
-    try {
+        String severityText =
+                severityField.getText().trim();
 
-        age = Integer.parseInt(ageText);
+        if (id.isEmpty() || name.isEmpty()) {
 
-    } catch (NumberFormatException e) {
-
-        showMessage(
-                "Age must be a valid number.",
-                "Invalid Age",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-    }
-
-    if (age < 0 || age > 150) {
-
-        showMessage(
-                "Age must be between 0 and 150.",
-                "Invalid Age",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-    }
-
-    if (gender.isEmpty()) {
-
-        showMessage(
-                "Gender is required.",
-                "Missing Information",
-                JOptionPane.WARNING_MESSAGE
-        );
-
-        return;
-    }
-
-    if (phone.isEmpty()) {
-
-        showMessage(
-                "Phone number is required.",
-                "Missing Information",
-                JOptionPane.WARNING_MESSAGE
-        );
-
-        return;
-    }
-
-    int severity;
-
-    try {
-
-        severity = Integer.parseInt(severityText);
-
-    } catch (NumberFormatException e) {
-
-        showMessage(
-                "Severity must be a number between 1 and 10.",
-                "Invalid Severity",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-    }
-
-    if (severity < 1 || severity > 10) {
-
-        showMessage(
-                "Severity must be between 1 and 10.",
-                "Invalid Severity",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-    }
-
-    Patient patient =
-            new Patient(
-                    id,
-                    name,
-                    age,
-                    gender,
-                    phone,
-                    severity
+            showMessage(
+                    "Patient ID and Name are required.",
+                    "Missing Information",
+                    JOptionPane.WARNING_MESSAGE
             );
 
-    boolean success =
-            patientRegistry.add(patient);
+            return;
+        }
 
-    if (success) {
+        if (patientRegistry.get(id) != null) {
 
-        refreshTable();
+            showMessage(
+                    "A patient with this ID already exists.",
+                    "Duplicate Patient",
+                    JOptionPane.WARNING_MESSAGE
+            );
 
-        clearFields();
+            return;
+        }
 
-        showMessage(
-                "Patient registered successfully!",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        int age;
 
-    } else {
+        try {
 
-        showMessage(
-                "A patient with this ID already exists.",
-                "Duplicate Patient",
-                JOptionPane.ERROR_MESSAGE
-        );
+            age =
+                    Integer.parseInt(ageText);
+
+        } catch (NumberFormatException e) {
+
+            showMessage(
+                    "Age must be a valid number.",
+                    "Invalid Age",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (age < 0 || age > 150) {
+
+            showMessage(
+                    "Age must be between 0 and 150.",
+                    "Invalid Age",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (gender.isEmpty()) {
+
+            showMessage(
+                    "Gender is required.",
+                    "Missing Information",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        if (phone.isEmpty()) {
+
+            showMessage(
+                    "Phone number is required.",
+                    "Missing Information",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        int severity;
+
+        try {
+
+            severity =
+                    Integer.parseInt(
+                            severityText
+                    );
+
+        } catch (NumberFormatException e) {
+
+            showMessage(
+                    "Severity must be a number between 1 and 10.",
+                    "Invalid Severity",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (severity < 1 || severity > 10) {
+
+            showMessage(
+                    "Severity must be between 1 and 10.",
+                    "Invalid Severity",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        Patient patient =
+                new Patient(
+                        id,
+                        name,
+                        age,
+                        gender,
+                        phone,
+                        severity
+                );
+
+        boolean success =
+                patientRegistry.add(patient);
+
+        if (success) {
+
+            refreshTable();
+
+            clearFields();
+
+            showMessage(
+                    "Patient registered successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } else {
+
+            showMessage(
+                    "Patient could not be registered.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
-}
-
 
     // =========================================
     // SEARCH PATIENT
@@ -665,7 +722,6 @@ public class PatientPanel extends JPanel {
 
         String id =
                 searchField.getText().trim();
-
 
         if (id.isEmpty()) {
 
@@ -678,10 +734,8 @@ public class PatientPanel extends JPanel {
             return;
         }
 
-
         Patient patient =
                 patientRegistry.get(id);
-
 
         if (patient == null) {
 
@@ -694,6 +748,357 @@ public class PatientPanel extends JPanel {
             return;
         }
 
+        loadPatientIntoFields(patient);
+
+        highlightPatient(
+                patient.getId()
+        );
+
+        showMessage(
+                "Patient found successfully.",
+                "Search Result",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    // =========================================
+    // UPDATE PATIENT
+    // =========================================
+
+    private void updatePatient() {
+
+        String id =
+                idField.getText().trim();
+
+        String name =
+                nameField.getText().trim();
+
+        String ageText =
+                ageField.getText().trim();
+
+        String gender =
+                genderField.getText().trim();
+
+        String phone =
+                phoneField.getText().trim();
+
+        String severityText =
+                severityField.getText().trim();
+
+        if (id.isEmpty()) {
+
+            showMessage(
+                    "Select or search a patient first.",
+                    "Update",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        if (name.isEmpty()) {
+
+            showMessage(
+                    "Patient name is required.",
+                    "Update Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        Patient existingPatient =
+                patientRegistry.get(id);
+
+        if (existingPatient == null) {
+
+            showMessage(
+                    "Patient not found.",
+                    "Update",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        int age;
+
+        try {
+
+            age =
+                    Integer.parseInt(ageText);
+
+        } catch (NumberFormatException e) {
+
+            showMessage(
+                    "Age must be a valid number.",
+                    "Update Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (age < 0 || age > 150) {
+
+            showMessage(
+                    "Age must be between 0 and 150.",
+                    "Update Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (gender.isEmpty()) {
+
+            showMessage(
+                    "Gender is required.",
+                    "Update Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        if (phone.isEmpty()) {
+
+            showMessage(
+                    "Phone number is required.",
+                    "Update Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        int severity;
+
+        try {
+
+            severity =
+                    Integer.parseInt(
+                            severityText
+                    );
+
+        } catch (NumberFormatException e) {
+
+            showMessage(
+                    "Severity must be a number between 1 and 10.",
+                    "Update Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        if (severity < 1 || severity > 10) {
+
+            showMessage(
+                    "Severity must be between 1 and 10.",
+                    "Update Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        int confirmation =
+                JOptionPane.showConfirmDialog(
+                        this,
+                        "Update patient information?\n\n"
+                                + "Patient: "
+                                + name
+                                + "\nID: "
+                                + id,
+                        "Confirm Update",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+        if (confirmation != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        existingPatient.setName(name);
+        existingPatient.setAge(age);
+        existingPatient.setGender(gender);
+        existingPatient.setPhone(phone);
+        existingPatient.setSeverity(severity);
+
+        patientRegistry.update(
+                id,
+                existingPatient
+        );
+
+        refreshTable();
+
+        highlightPatient(id);
+
+        showMessage(
+                "Patient updated successfully!",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    // =========================================
+    // DELETE PATIENT
+    // =========================================
+
+    private void deletePatient() {
+
+        String id =
+                searchField.getText().trim();
+
+        if (id.isEmpty()) {
+            id = idField.getText().trim();
+        }
+
+        if (id.isEmpty()) {
+
+            showMessage(
+                    "Select a patient or enter an ID.",
+                    "Delete",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        Patient patient =
+                patientRegistry.get(id);
+
+        if (patient == null) {
+
+            showMessage(
+                    "Patient not found.",
+                    "Delete Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        int confirmation =
+                JOptionPane.showConfirmDialog(
+                        this,
+                        "Are you sure you want to delete patient:\n\n"
+                                + patient.getName()
+                                + "\nID: "
+                                + id,
+                        "Confirm Delete",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+        if (confirmation != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean success =
+                patientRegistry.delete(id);
+
+        if (success) {
+
+            refreshTable();
+
+            clearFields();
+
+            searchField.setText("");
+
+            showMessage(
+                    "Patient deleted successfully.",
+                    "Deleted",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } else {
+
+            showMessage(
+                    "Patient could not be deleted.",
+                    "Delete Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =========================================
+    // REFRESH TABLE
+    // =========================================
+
+    private void refreshTable() {
+
+        if (tableModel == null) {
+            return;
+        }
+
+        tableModel.setRowCount(0);
+
+        List<Patient> patients =
+                patientRegistry.getAllPatients();
+
+        for (Patient patient : patients) {
+
+            tableModel.addRow(
+                    new Object[]{
+                            patient.getId(),
+                            patient.getName(),
+                            patient.getAge(),
+                            patient.getGender(),
+                            patient.getPhone(),
+                            patient.getSeverity()
+                    }
+            );
+        }
+    }
+
+    // =========================================
+    // SELECT TABLE ROW
+    // =========================================
+
+    private void loadSelectedPatient() {
+
+        int row =
+                patientTable.getSelectedRow();
+
+        if (row == -1) {
+            return;
+        }
+
+        Object value =
+                tableModel.getValueAt(
+                        row,
+                        0
+                );
+
+        if (value == null) {
+            return;
+        }
+
+        String id =
+                value.toString();
+
+        Patient patient =
+                patientRegistry.get(id);
+
+        if (patient != null) {
+
+            loadPatientIntoFields(patient);
+
+            searchField.setText(
+                    patient.getId()
+            );
+        }
+    }
+
+    // =========================================
+    // LOAD PATIENT
+    // =========================================
+
+    private void loadPatientIntoFields(
+            Patient patient
+    ) {
 
         idField.setText(
                 patient.getId()
@@ -722,342 +1127,7 @@ public class PatientPanel extends JPanel {
                         patient.getSeverity()
                 )
         );
-
-
-        highlightPatient(
-                patient.getId()
-        );
-
-
-        showMessage(
-                "Patient found successfully.",
-                "Search Result",
-                JOptionPane.INFORMATION_MESSAGE
-        );
     }
-
-
-    // =========================================
-    // UPDATE PATIENT
-    // =========================================
-
-    private void updatePatient() {
-
-        String id =
-                idField.getText().trim();
-
-        String name =
-                nameField.getText().trim();
-
-        String ageText =
-                ageField.getText().trim();
-
-        String gender =
-                genderField.getText().trim();
-
-        String phone =
-                phoneField.getText().trim(); 
-
-        String severityText =
-                severityField.getText().trim();
-
-        int severity;
-
-        try {
-
-        severity = Integer.parseInt(severityText);
-
-        } catch (NumberFormatException e) {
-
-        showMessage(
-                "Invalid severity value.",
-                "Update Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-        }
-
-        if (severity < 1 || severity > 10) {
-
-        showMessage(
-                "Severity must be between 1 and 10.",
-                "Update Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-        }
-
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Select or search a patient first.",
-                    "Update",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Patient existingPatient =
-                patientRegistry.get(id);
-
-
-        if (existingPatient == null) {
-
-            showMessage(
-                    "Patient not found.",
-                    "Update",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        int age;
-
-        try {
-
-        age = Integer.parseInt(ageText);
-
-        } catch (NumberFormatException e) {
-
-        showMessage(
-                "Age must be a valid number.",
-                "Update Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-        }
-
-        if (age < 0 || age > 150) {
-
-        showMessage(
-                "Age must be between 0 and 150.",
-                "Update Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        return;
-        }
-
-        if (gender.isEmpty() || phone.isEmpty()) {
-
-        showMessage(
-                "Gender and Phone are required.",
-                "Update Error",
-                JOptionPane.WARNING_MESSAGE
-        );
-
-        return;
-        }
-
-        existingPatient.setName(name);
-        existingPatient.setAge(age);
-        existingPatient.setGender(gender);
-        existingPatient.setPhone(phone);
-        existingPatient.setSeverity(severity);
-
-        patientRegistry.update(
-                id,
-                existingPatient
-        );
-
-
-        refreshTable();
-
-
-        showMessage(
-                "Patient updated successfully!",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-
-    // =========================================
-    // DELETE PATIENT
-    // =========================================
-
-    private void deletePatient() {
-
-        String id =
-                searchField.getText().trim();
-
-
-        if (id.isEmpty()) {
-
-            id =
-                    idField.getText().trim();
-        }
-
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Select a patient or enter an ID.",
-                    "Delete",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-
-        int confirmation =
-                JOptionPane.showConfirmDialog(
-
-                        this,
-
-                        "Are you sure you want to delete patient:\n"
-                                + id + "?",
-
-                        "Confirm Delete",
-
-                        JOptionPane.YES_NO_OPTION,
-
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-
-        if (confirmation !=
-                JOptionPane.YES_OPTION) {
-
-            return;
-        }
-
-
-        boolean success =
-                patientRegistry.delete(id);
-
-
-        if (success) {
-
-            refreshTable();
-
-            clearFields();
-
-            searchField.setText("");
-
-
-            showMessage(
-                    "Patient deleted successfully.",
-                    "Deleted",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-        }
-
-        else {
-
-            showMessage(
-                    "Patient not found.",
-                    "Delete Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
-
-
-    // =========================================
-    // REFRESH TABLE
-    // =========================================
-
-    private void refreshTable() {
-
-        tableModel.setRowCount(0);
-
-
-        List<Patient> patients =
-                patientRegistry.getAllPatients();
-
-
-        for (Patient patient : patients) {
-
-            tableModel.addRow(
-
-                    new Object[]{
-
-                            patient.getId(),
-                            patient.getName(),
-                            patient.getAge(),
-                            patient.getGender(),
-                            patient.getPhone(),
-                            patient.getSeverity()
-                    }
-            );
-        }
-    }
-
-
-    // =========================================
-    // SELECT TABLE ROW
-    // =========================================
-
-    private void loadSelectedPatient() {
-
-        int row =
-                patientTable.getSelectedRow();
-
-
-        if (row == -1) {
-
-            return;
-        }
-
-
-        String id =
-                tableModel
-                        .getValueAt(row, 0)
-                        .toString();
-
-
-        Patient patient =
-                patientRegistry.get(id);
-
-
-        if (patient != null) {
-
-            idField.setText(
-                    patient.getId()
-            );
-
-            nameField.setText(
-                    patient.getName()
-            );
-
-            ageField.setText(
-                    String.valueOf(
-                            patient.getAge()
-                    )
-            );
-
-            genderField.setText(
-                    patient.getGender()
-            );
-
-            phoneField.setText(
-                    patient.getPhone()
-            );
-
-            severityField.setText(
-                    String.valueOf(
-                            patient.getSeverity()
-                    )
-            );
-
-
-            searchField.setText(
-                    patient.getId()
-            );
-        }
-    }
-
 
     // =========================================
     // HIGHLIGHT PATIENT
@@ -1067,32 +1137,44 @@ public class PatientPanel extends JPanel {
             String patientId
     ) {
 
+        if (patientId == null) {
+            return;
+        }
+
         for (
                 int i = 0;
-
                 i < tableModel.getRowCount();
-
                 i++
         ) {
 
-            String id =
-                    tableModel
-                            .getValueAt(i, 0)
-                            .toString();
+            Object value =
+                    tableModel.getValueAt(
+                            i,
+                            0
+                    );
 
-
-            if (id.equals(patientId)) {
+            if (value != null
+                    && value.toString()
+                    .equals(patientId)) {
 
                 patientTable.setRowSelectionInterval(
                         i,
                         i
                 );
 
+                patientTable.scrollRectToVisible(
+                        patientTable
+                                .getCellRect(
+                                        i,
+                                        0,
+                                        true
+                                )
+                );
+
                 break;
             }
         }
     }
-
 
     // =========================================
     // CLEAR
@@ -1111,8 +1193,11 @@ public class PatientPanel extends JPanel {
         phoneField.setText("");
 
         severityField.setText("1");
-    }
 
+        if (patientTable != null) {
+            patientTable.clearSelection();
+        }
+    }
 
     // =========================================
     // HELPER METHODS
@@ -1130,7 +1215,6 @@ public class PatientPanel extends JPanel {
         );
     }
 
-
     private EmptyBorder createCardBorder() {
 
         return new EmptyBorder(
@@ -1141,24 +1225,16 @@ public class PatientPanel extends JPanel {
         );
     }
 
-
     private void showMessage(
-
             String message,
-
             String title,
-
             int type
     ) {
 
         JOptionPane.showMessageDialog(
-
                 this,
-
                 message,
-
                 title,
-
                 type
         );
     }
