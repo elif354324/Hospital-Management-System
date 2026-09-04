@@ -303,7 +303,7 @@ public class EmergencyPanel extends JPanel {
 
 
         severityField =
-                new JTextField("5");
+                new JTextField();
 
 
         prepareField(severityField);
@@ -1209,7 +1209,7 @@ public class EmergencyPanel extends JPanel {
     }
 
 
-    private void showMessage(
+        private void showMessage(
 
             String message,
 
@@ -1228,5 +1228,15 @@ public class EmergencyPanel extends JPanel {
 
                 type
         );
+    }
+
+
+    // =========================================
+    // PUBLIC REFRESH
+    // =========================================
+
+    public void refresh() {
+
+        refreshEmergencyInformation();
     }
 }

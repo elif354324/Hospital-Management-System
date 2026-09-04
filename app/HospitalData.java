@@ -12,8 +12,9 @@ import services.EmergencyTriage;
 public class HospitalData {
 
     private static final long STUDENT_ID = 220315022L;
+
     private static final AppointmentScheduler appointmentScheduler =
-        new AppointmentScheduler();
+            new AppointmentScheduler();
 
     // =========================
     // EMERGENCY SYSTEM
@@ -51,6 +52,10 @@ public class HospitalData {
 
     private static void initializeDoctors() {
 
+        // =========================
+        // DEPARTMENTS
+        // =========================
+
         Department cardiology =
                 new Department(
                         "Cardiology",
@@ -73,14 +78,21 @@ public class HospitalData {
 
 
         departments.add(cardiology);
+
         departments.add(neurology);
+
         departments.add(orthopedics);
 
+
+        // =========================
+        // DOCTORS
+        // =========================
 
         Doctor drSmith =
                 new Doctor(
                         "DOC-NEU-001",
                         "Dr. Michael Smith",
+                        "Neurologist",
                         neurology
                 );
 
@@ -89,6 +101,7 @@ public class HospitalData {
                 new Doctor(
                         "DOC-HRT-002",
                         "Dr. Sarah Johnson",
+                        "Cardiologist",
                         cardiology
                 );
 
@@ -97,9 +110,14 @@ public class HospitalData {
                 new Doctor(
                         "DOC-ORT-001",
                         "Dr. Robert Williams",
+                        "Orthopedic Surgeon",
                         orthopedics
                 );
 
+
+        // =========================
+        // ADD TO HASH TABLE
+        // =========================
 
         doctorRegistry.put(
                 drSmith.getId(),
@@ -129,10 +147,12 @@ public class HospitalData {
         return patientRegistry;
     }
 
+
     public static AppointmentScheduler getAppointmentScheduler() {
 
-    return appointmentScheduler;
-}
+        return appointmentScheduler;
+    }
+
 
     public static HashTable<Doctor> getDoctorRegistry() {
 
@@ -145,7 +165,9 @@ public class HospitalData {
         return departments;
     }
 
-    public static EmergencyTriage getEmergencySystem(){
-      return emergencySystem;
+
+    public static EmergencyTriage getEmergencySystem() {
+
+        return emergencySystem;
     }
 }

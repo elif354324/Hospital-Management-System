@@ -6,6 +6,9 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 public class MainFrame extends JFrame {
 
     private CardLayout cardLayout;
@@ -17,6 +20,10 @@ public class MainFrame extends JFrame {
     private Map<String, SidebarButton> menuButtons;
 
     private DashboardPanel dashboardPanel;
+
+    private DoctorPanel doctorPanel;
+
+    private EmergencyPanel emergencyPanel;
 
 
     public MainFrame() {
@@ -30,6 +37,8 @@ public class MainFrame extends JFrame {
         createSidebar();
 
         createMainPanel();
+
+        setupResponsiveLayout();
 
 
         setVisible(true);
@@ -60,8 +69,8 @@ public class MainFrame extends JFrame {
 
         setMinimumSize(
                 new Dimension(
-                        1100,
-                        700
+                        800,
+                        600
                 )
         );
 
@@ -504,9 +513,9 @@ public class MainFrame extends JFrame {
                 "PATIENTS"
         );
 
-
+        doctorPanel = new DoctorPanel();
         mainPanel.add(
-                new DoctorPanel(),
+                doctorPanel,
                 "DOCTORS"
         );
 
@@ -516,9 +525,9 @@ public class MainFrame extends JFrame {
                 "APPOINTMENTS"
         );
 
-
+        emergencyPanel = new EmergencyPanel();
         mainPanel.add(
-                new EmergencyPanel(),
+                emergencyPanel,
                 "EMERGENCY"
         );
 
@@ -538,31 +547,75 @@ public class MainFrame extends JFrame {
         showPage("DASHBOARD");
     }
 
+    private void setupResponsiveLayout() {
+
+    addComponentListener(
+            new ComponentAdapter() {
+
+                @Override
+                public void componentResized(
+                        ComponentEvent e
+                ) {
+
+                    int width =
+                            getWidth();
+
+                    if (width < 1000) {
+
+                        sidebar.setPreferredSize(
+                                new Dimension(
+                                        180,
+                                        0
+                                )
+                        );
+
+                    } else {
+
+                        sidebar.setPreferredSize(
+                                new Dimension(
+                                        240,
+                                        0
+                                )
+                        );
+                    }
+
+                    revalidate();
+                    repaint();
+                }
+            }
+    );
+}
+
 
     // =========================================
     // PAGE NAVIGATION
     // =========================================
 
-    private void showPage(
-            String page
-    ) {
+ private void showPage(
+        String page
+) {
 
-        cardLayout.show(
-                mainPanel,
-                page
-        );
+    cardLayout.show(
+            mainPanel,
+            page
+    );
+
+    updateSelectedButton(page);
 
 
-        updateSelectedButton(page);
+    if (page.equals("DASHBOARD")) {
 
+        dashboardPanel.refresh();
 
-        if (
-                page.equals("DASHBOARD")
-        ) {
+    } else if (page.equals("DOCTORS")) {
 
-            dashboardPanel.refresh();
-        }
+        doctorPanel.refresh();
+
+    } else if (page.equals("EMERGENCY")) {
+
+        emergencyPanel.refresh();
     }
+}
 
 
     // =========================================

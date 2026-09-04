@@ -15,6 +15,7 @@ public class DoctorPanel extends JPanel {
 
     private JTextField idField;
     private JTextField nameField;
+    private JTextField specialtyField;
 
     private JComboBox<String> departmentBox;
 
@@ -354,6 +355,33 @@ public class DoctorPanel extends JPanel {
                 Box.createVerticalStrut(10)
         );
 
+        // Specialty
+
+        card.add(
+                new JLabel(
+                        "Specialty"
+                )
+        );
+
+
+        specialtyField =
+                new JTextField();
+
+
+        prepareField(
+                specialtyField
+        );
+
+
+        card.add(
+                specialtyField
+        );
+
+
+        card.add(
+                Box.createVerticalStrut(10)
+        );
+
 
         // Department
 
@@ -391,10 +419,10 @@ public class DoctorPanel extends JPanel {
         JPanel buttonPanel =
                 new JPanel(
                         new GridLayout(
-                                1,
+                                2,
                                 2,
                                 10,
-                                0
+                                10
                         )
                 );
 
@@ -407,17 +435,35 @@ public class DoctorPanel extends JPanel {
                         "Add Doctor"
                 );
 
+        JButton updateButton =
+                new JButton(
+                        "Update Doctor"
+                );
+
+        JButton deleteButton =
+                new JButton(
+                        "Delete Doctor"
+                );
+
 
         JButton clearButton =
                 new JButton(
                         "Clear"
                 );
+                
 
 
         addButton.addActionListener(
-                e -> addDoctor()
+        e -> addDoctor()
         );
 
+        updateButton.addActionListener(
+                e -> updateDoctor()
+        );
+
+        deleteButton.addActionListener(
+                e -> deleteDoctor()
+        );
 
         clearButton.addActionListener(
                 e -> clearFields()
@@ -425,6 +471,10 @@ public class DoctorPanel extends JPanel {
 
 
         buttonPanel.add(addButton);
+
+        buttonPanel.add(updateButton);
+
+        buttonPanel.add(deleteButton);
 
         buttonPanel.add(clearButton);
 
@@ -587,6 +637,8 @@ public class DoctorPanel extends JPanel {
                 "Doctor ID",
 
                 "Doctor Name",
+                
+                "Specialty",
 
                 "Department",
 
@@ -692,16 +744,20 @@ public class DoctorPanel extends JPanel {
         String name =
                 nameField.getText().trim();
 
+        String specialty =
+                specialtyField.getText().trim();        
+
 
         String departmentName =
                 (String)
                         departmentBox.getSelectedItem();
 
 
-        if (id.isEmpty() || name.isEmpty()) {
+        if (
+                id.isEmpty() || name.isEmpty() || specialty.isEmpty()) {
 
             showMessage(
-                    "Doctor ID and Name are required.",
+                    "Doctor ID, Name, and Specialty are required.",
                     "Missing Information",
                     JOptionPane.WARNING_MESSAGE
             );
@@ -748,17 +804,18 @@ public class DoctorPanel extends JPanel {
                 new Doctor(
                         id,
                         name,
+                        specialty,
                         selectedDepartment
                 );
 
 
-        Doctor result =
         doctorRegistry.put(
-                doctor.getId(),
-                doctor
-        );
+        doctor.getId(),
+        doctor
+);
 
-boolean success = result != null;
+        boolean success =
+                doctorRegistry.get(doctor.getId()) != null;
 
 
         if (success) {
@@ -853,6 +910,9 @@ boolean success = result != null;
                         + "\nID: "
                         + doctor.getId()
 
+                        + "\nSpecialty: "
+                        + doctor.getSpecialty()
+
                         + "\nDepartment: "
                         + doctor.getDepartment().getName()
 
@@ -888,6 +948,8 @@ boolean success = result != null;
                             doctor.getId(),
 
                             doctor.getName(),
+
+                            doctor.getSpecialty(),
 
                             doctor.getDepartment().getName(),
 
@@ -936,6 +998,10 @@ boolean success = result != null;
 
             nameField.setText(
                     doctor.getName()
+            );
+
+            specialtyField.setText(
+                    doctor.getSpecialty()
             );
 
 
@@ -1017,6 +1083,200 @@ boolean success = result != null;
         }
     }
 
+        // =========================================
+        // UPDATE DOCTOR
+        // =========================================
+
+        private void updateDoctor() {
+
+        String id =
+                idField.getText().trim();
+
+
+        String name =
+                nameField.getText().trim();
+
+
+        String specialty =
+                specialtyField.getText().trim();
+
+
+        String departmentName =
+                (String) departmentBox.getSelectedItem();
+
+
+        // Check Doctor ID
+
+        if (id.isEmpty()) {
+
+                showMessage(
+                        "Please select or search for a doctor first.",
+                        "Update Doctor",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+        }
+
+
+        // Check required fields
+
+        if (
+                name.isEmpty()
+                || specialty.isEmpty()
+        ) {
+
+                showMessage(
+                        "Doctor Name and Specialty are required.",
+                        "Missing Information",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+        }
+
+
+        // Find doctor
+
+        Doctor doctor =
+                doctorRegistry.get(id);
+
+
+        if (doctor == null) {
+
+                showMessage(
+                        "Doctor not found.",
+                        "Update Doctor",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+        }
+
+
+        // Find selected department
+
+        Department selectedDepartment =
+                findDepartment(departmentName);
+
+
+        if (selectedDepartment == null) {
+
+                showMessage(
+                        "Department not found.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+        }
+
+
+        // Update doctor information
+
+        doctor.setName(name);
+
+        doctor.setSpecialty(specialty);
+
+        doctor.setDepartment(selectedDepartment);
+
+
+        refreshTable();
+
+
+        highlightDoctor(id);
+
+
+        showMessage(
+                "Doctor information updated successfully!",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+        }
+
+        // =========================================
+        // DELETE DOCTOR
+        // =========================================
+
+        private void deleteDoctor() {
+
+        String id = idField.getText().trim();
+
+        if (id.isEmpty()) {
+
+                showMessage(
+                        "Please select or search for a doctor first.",
+                        "Delete Doctor",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+        }
+
+        Doctor doctor = doctorRegistry.get(id);
+
+        if (doctor == null) {
+
+                showMessage(
+                        "Doctor not found.",
+                        "Delete Doctor",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+        }
+
+        int confirmation =
+                JOptionPane.showConfirmDialog(
+                        this,
+
+                        "Are you sure you want to remove this doctor?\n\n"
+                                + "Doctor: "
+                                + doctor.getName()
+                                + "\nID: "
+                                + doctor.getId()
+                                + "\nDepartment: "
+                                + doctor.getDepartment().getName(),
+
+                        "Confirm Doctor Removal",
+
+                        JOptionPane.YES_NO_OPTION,
+
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+        if (confirmation != JOptionPane.YES_OPTION) {
+                return;
+        }
+
+        Doctor removed =
+                doctorRegistry.remove(id);
+
+        if (removed != null) {
+
+        removed.getDepartment().removeDoctor();
+
+        refreshTable();
+
+        clearFields();
+
+        searchField.setText("");
+
+        showMessage(
+                "Doctor removed successfully.",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        } else {
+
+        showMessage(
+                "Could not remove doctor.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        }
+}
 
     // =========================================
     // CLEAR
@@ -1027,6 +1287,8 @@ boolean success = result != null;
         idField.setText("");
 
         nameField.setText("");
+
+        specialtyField.setText("");
 
 
         if (
@@ -1076,5 +1338,7 @@ boolean success = result != null;
         );
     }
 
-  public void refresh(){} 
+  public void refresh(){
+        refreshTable();
+  } 
 }

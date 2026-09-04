@@ -59,6 +59,20 @@ public class Appointment {
     public String getDate() { 
         return date; 
     }
+
+    // ==================== SETTER METHODS ====================
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public void setTime(LocalTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
     
     /**
      * Returns appointment information

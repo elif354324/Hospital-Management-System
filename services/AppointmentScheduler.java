@@ -91,17 +91,40 @@ public class AppointmentScheduler {
      * * @return Next patient or null if queue empty
      */
     public Patient callNextPatient() {
-        Patient nextPatient = appointmentQueue.dequeue();
-        if (nextPatient != null) {
-            // Consistency: Remove from lookup table once called
-            scheduledAppointments.remove(nextPatient.getId());
-            System.out.println("   [APPOINTMENT] Calling next patient: " + 
-                             nextPatient.getName());
-        } else {
-            System.out.println("   [APPOINTMENT] No patients in queue.");
+
+    Patient nextPatient =
+            appointmentQueue.dequeue();
+
+    if (nextPatient != null) {
+
+        Appointment appointment =
+                scheduledAppointments.remove(
+                        nextPatient.getId()
+                );
+
+        if (appointment != null
+                && appointment.getDoctor() != null) {
+
+            appointment.getDoctor()
+                    .removePatientFromQueue(
+                            nextPatient.getId()
+                    );
         }
-        return nextPatient;
+
+        System.out.println(
+                "   [APPOINTMENT] Calling next patient: "
+                        + nextPatient.getName()
+        );
+
+    } else {
+
+        System.out.println(
+                "   [APPOINTMENT] No patients in queue."
+        );
     }
+
+    return nextPatient;
+}
     
     /**
      * Views next patient without removing from queue (O(1)).
@@ -174,6 +197,101 @@ public class AppointmentScheduler {
     public boolean hasWaitingPatients() { return appointmentQueue.size() > 0; }
     public boolean isEmpty() { return appointmentQueue.isEmpty(); }
     public boolean hasAppointment(String patientId) { return scheduledAppointments.containsKey(patientId); }
+
+    public boolean updateAppointment(
+        String patientId,
+        Doctor newDoctor,
+        String newTimeStr,
+        String newDate) {
+
+    if (patientId == null || patientId.trim().isEmpty()) {
+        return false;
+    }
+
+    Appointment appointment =
+            scheduledAppointments.get(patientId);
+
+    if (appointment == null) {
+        return false;
+    }
+
+    try {
+        LocalTime newTime =
+                LocalTime.parse(newTimeStr, TIME_FORMAT);
+
+        Doctor oldDoctor =
+                appointment.getDoctor();
+
+        // Eski doktorun bekleme kuyruğundan çıkar
+        if (oldDoctor != null) {
+            oldDoctor.removePatientFromQueue(patientId);
+        }
+
+        // Randevu bilgilerini güncelle
+        appointment.setDoctor(newDoctor);
+        appointment.setTime(newTime);
+        appointment.setDate(newDate);
+
+        // Yeni doktorun kuyruğuna ekle
+        if (newDoctor != null) {
+            Patient patient =
+                    appointment.getPatient();
+
+            newDoctor.addPatientToQueue(patient);
+        }
+
+        System.out.println(
+                "   [APPOINTMENT] Appointment updated for: "
+                        + appointment.getPatient().getName()
+        );
+
+        return true;
+
+    } catch (DateTimeParseException e) {
+
+        System.out.println(
+                "   [ERROR] Invalid time format. Use HH:mm"
+        );
+
+        return false;
+    }
+}
+
+    public boolean cancelAppointment(String patientId) {
+
+        if (patientId == null || patientId.trim().isEmpty()) {
+            return false;
+        }
+
+        Appointment appointment =
+                scheduledAppointments.get(patientId);
+
+        if (appointment == null) {
+            return false;
+        }
+
+        // Ana appointment kaydından çıkar
+        scheduledAppointments.remove(patientId);
+
+        // Ana FIFO kuyruğundan çıkar
+        appointmentQueue.removePatient(patientId);
+
+        // Doktorun kendi bekleme kuyruğundan çıkar
+        Doctor doctor =
+                appointment.getDoctor();
+
+        if (doctor != null) {
+            doctor.removePatientFromQueue(patientId);
+        }
+
+        System.out.println(
+                "   [APPOINTMENT] Cancelled appointment for: "
+                        + appointment.getPatient().getName()
+        );
+
+        return true;
+    }
+
     public List<Appointment> getAllAppointments() {
     return new ArrayList<>(
             scheduledAppointments.values()

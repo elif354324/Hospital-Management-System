@@ -14,6 +14,9 @@ public class PatientPanel extends JPanel {
 
     private JTextField idField;
     private JTextField nameField;
+    private JTextField ageField;
+    private JTextField genderField;
+    private JTextField phoneField;
     private JTextField severityField;
 
     private JTextField searchField;
@@ -172,127 +175,145 @@ public class PatientPanel extends JPanel {
 
     private JPanel createPatientForm() {
 
-        JPanel card = new JPanel();
+    JPanel card = new JPanel();
 
-        card.setLayout(
-                new BoxLayout(card, BoxLayout.Y_AXIS)
-        );
+    card.setLayout(
+            new BoxLayout(card, BoxLayout.Y_AXIS)
+    );
 
-        card.setBackground(Color.WHITE);
+    card.setBackground(Color.WHITE);
 
-        card.setBorder(
-                createCardBorder()
-        );
+    card.setBorder(
+            createCardBorder()
+    );
 
+    JLabel title =
+            new JLabel("Patient Information");
 
-        JLabel title =
-                new JLabel("Patient Information");
+    title.setFont(
+            new Font("Arial", Font.BOLD, 20)
+    );
 
-        title.setFont(
-                new Font("Arial", Font.BOLD, 20)
-        );
+    card.add(title);
 
+    card.add(
+            Box.createVerticalStrut(15)
+    );
 
-        card.add(title);
+    // ID
+    card.add(new JLabel("Patient ID"));
 
-        card.add(
-                Box.createVerticalStrut(20)
-        );
+    idField = new JTextField();
 
+    prepareTextField(idField);
 
-        card.add(
-                new JLabel("Patient ID")
-        );
+    card.add(idField);
 
-        idField = new JTextField();
+    card.add(
+            Box.createVerticalStrut(8)
+    );
 
-        prepareTextField(idField);
+    // NAME
+    card.add(new JLabel("Patient Name"));
 
-        card.add(idField);
+    nameField = new JTextField();
 
+    prepareTextField(nameField);
 
-        card.add(
-                Box.createVerticalStrut(10)
-        );
+    card.add(nameField);
 
+    card.add(
+            Box.createVerticalStrut(8)
+    );
 
-        card.add(
-                new JLabel("Patient Name")
-        );
+    // AGE
+    card.add(new JLabel("Age"));
 
-        nameField = new JTextField();
+    ageField = new JTextField();
 
-        prepareTextField(nameField);
+    prepareTextField(ageField);
 
-        card.add(nameField);
+    card.add(ageField);
 
+    card.add(
+            Box.createVerticalStrut(8)
+    );
 
-        card.add(
-                Box.createVerticalStrut(10)
-        );
+    // GENDER
+    card.add(new JLabel("Gender"));
 
+    genderField = new JTextField();
 
-        card.add(
-                new JLabel("Severity (1-10)")
-        );
+    prepareTextField(genderField);
 
-        severityField = new JTextField("1");
+    card.add(genderField);
 
-        prepareTextField(severityField);
+    card.add(
+            Box.createVerticalStrut(8)
+    );
 
-        card.add(severityField);
+    // PHONE
+    card.add(new JLabel("Phone"));
 
+    phoneField = new JTextField();
 
-        card.add(
-                Box.createVerticalStrut(20)
-        );
+    prepareTextField(phoneField);
 
+    card.add(phoneField);
 
-        JPanel buttonPanel =
-                new JPanel(
-                        new GridLayout(1, 3, 10, 0)
-                );
+    card.add(
+            Box.createVerticalStrut(8)
+    );
 
-        buttonPanel.setBackground(Color.WHITE);
+    // SEVERITY
+    card.add(new JLabel("Severity (1-10)"));
 
+    severityField = new JTextField();
 
-        JButton addButton =
-                new JButton("Add");
+    prepareTextField(severityField);
 
-        JButton updateButton =
-                new JButton("Update");
+    card.add(severityField);
 
-        JButton clearButton =
-                new JButton("Clear");
+    card.add(
+            Box.createVerticalStrut(15)
+    );
 
+    JPanel buttonPanel =
+            new JPanel(
+                    new GridLayout(1, 3, 10, 0)
+            );
 
-        addButton.addActionListener(
-                e -> addPatient()
-        );
+    buttonPanel.setBackground(Color.WHITE);
 
+    JButton addButton =
+            new JButton("Add");
 
-        updateButton.addActionListener(
-                e -> updatePatient()
-        );
+    JButton updateButton =
+            new JButton("Update");
 
+    JButton clearButton =
+            new JButton("Clear");
 
-        clearButton.addActionListener(
-                e -> clearFields()
-        );
+    addButton.addActionListener(
+            e -> addPatient()
+    );
 
+    updateButton.addActionListener(
+            e -> updatePatient()
+    );
 
-        buttonPanel.add(addButton);
+    clearButton.addActionListener(
+            e -> clearFields()
+    );
 
-        buttonPanel.add(updateButton);
+    buttonPanel.add(addButton);
+    buttonPanel.add(updateButton);
+    buttonPanel.add(clearButton);
 
-        buttonPanel.add(clearButton);
+    card.add(buttonPanel);
 
-
-        card.add(buttonPanel);
-
-
-        return card;
-    }
+    return card;
+}
 
 
     // =========================================
@@ -419,9 +440,10 @@ public class PatientPanel extends JPanel {
         String[] columns = {
 
                 "Patient ID",
-
                 "Patient Name",
-
+                "Age",
+                "Gender",
+                "Phone",
                 "Severity"
         };
 
@@ -503,97 +525,136 @@ public class PatientPanel extends JPanel {
 
     private void addPatient() {
 
-        String id =
-                idField.getText().trim();
+    String id = idField.getText().trim();
+    String name = nameField.getText().trim();
+    String ageText = ageField.getText().trim();
+    String gender = genderField.getText().trim();
+    String phone = phoneField.getText().trim();
+    String severityText = severityField.getText().trim();
 
-        String name =
-                nameField.getText().trim();
+    if (id.isEmpty() || name.isEmpty()) {
 
-        String severityText =
-                severityField.getText().trim();
+        showMessage(
+                "Patient ID and Name are required.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
 
-
-        if (id.isEmpty() || name.isEmpty()) {
-
-            showMessage(
-                    "Patient ID and Name are required.",
-                    "Missing Information",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-
-        int severity;
-
-        try {
-
-            severity =
-                    Integer.parseInt(severityText);
-
-        }
-
-        catch (NumberFormatException e) {
-
-            showMessage(
-                    "Severity must be a number between 1 and 10.",
-                    "Invalid Severity",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        if (severity < 1 || severity > 10) {
-
-            showMessage(
-                    "Severity must be between 1 and 10.",
-                    "Invalid Severity",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        Patient patient =
-                new Patient(
-                        id,
-                        name,
-                        severity
-                );
-
-
-        boolean success =
-                patientRegistry.add(patient);
-
-
-        if (success) {
-
-            refreshTable();
-
-            clearFields();
-
-
-            showMessage(
-                    "Patient registered successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-        }
-
-        else {
-
-            showMessage(
-                    "A patient with this ID already exists.",
-                    "Duplicate Patient",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
+        return;
     }
+
+    int age;
+
+    try {
+
+        age = Integer.parseInt(ageText);
+
+    } catch (NumberFormatException e) {
+
+        showMessage(
+                "Age must be a valid number.",
+                "Invalid Age",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    if (age < 0 || age > 150) {
+
+        showMessage(
+                "Age must be between 0 and 150.",
+                "Invalid Age",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    if (gender.isEmpty()) {
+
+        showMessage(
+                "Gender is required.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    if (phone.isEmpty()) {
+
+        showMessage(
+                "Phone number is required.",
+                "Missing Information",
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return;
+    }
+
+    int severity;
+
+    try {
+
+        severity = Integer.parseInt(severityText);
+
+    } catch (NumberFormatException e) {
+
+        showMessage(
+                "Severity must be a number between 1 and 10.",
+                "Invalid Severity",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    if (severity < 1 || severity > 10) {
+
+        showMessage(
+                "Severity must be between 1 and 10.",
+                "Invalid Severity",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    Patient patient =
+            new Patient(
+                    id,
+                    name,
+                    age,
+                    gender,
+                    phone,
+                    severity
+            );
+
+    boolean success =
+            patientRegistry.add(patient);
+
+    if (success) {
+
+        refreshTable();
+
+        clearFields();
+
+        showMessage(
+                "Patient registered successfully!",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+    } else {
+
+        showMessage(
+                "A patient with this ID already exists.",
+                "Duplicate Patient",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+}
 
 
     // =========================================
@@ -642,6 +703,20 @@ public class PatientPanel extends JPanel {
                 patient.getName()
         );
 
+        ageField.setText(
+                String.valueOf(
+                        patient.getAge()
+                )
+        );
+
+        genderField.setText(
+                patient.getGender()
+        );
+
+        phoneField.setText(
+                patient.getPhone()
+        );
+
         severityField.setText(
                 String.valueOf(
                         patient.getSeverity()
@@ -674,8 +749,45 @@ public class PatientPanel extends JPanel {
         String name =
                 nameField.getText().trim();
 
+        String ageText =
+                ageField.getText().trim();
+
+        String gender =
+                genderField.getText().trim();
+
+        String phone =
+                phoneField.getText().trim(); 
+
         String severityText =
                 severityField.getText().trim();
+
+        int severity;
+
+        try {
+
+        severity = Integer.parseInt(severityText);
+
+        } catch (NumberFormatException e) {
+
+        showMessage(
+                "Invalid severity value.",
+                "Update Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+        }
+
+        if (severity < 1 || severity > 10) {
+
+        showMessage(
+                "Severity must be between 1 and 10.",
+                "Update Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+        }
 
 
         if (id.isEmpty()) {
@@ -706,43 +818,50 @@ public class PatientPanel extends JPanel {
         }
 
 
-        int severity;
+        int age;
 
         try {
 
-            severity =
-                    Integer.parseInt(severityText);
+        age = Integer.parseInt(ageText);
 
+        } catch (NumberFormatException e) {
+
+        showMessage(
+                "Age must be a valid number.",
+                "Update Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
         }
 
-        catch (NumberFormatException e) {
+        if (age < 0 || age > 150) {
 
-            showMessage(
-                    "Invalid severity value.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+        showMessage(
+                "Age must be between 0 and 150.",
+                "Update Error",
+                JOptionPane.ERROR_MESSAGE
+        );
 
-            return;
+        return;
         }
 
+        if (gender.isEmpty() || phone.isEmpty()) {
 
-        if (severity < 1 || severity > 10) {
+        showMessage(
+                "Gender and Phone are required.",
+                "Update Error",
+                JOptionPane.WARNING_MESSAGE
+        );
 
-            showMessage(
-                    "Severity must be between 1 and 10.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
+        return;
         }
-
 
         existingPatient.setName(name);
-
+        existingPatient.setAge(age);
+        existingPatient.setGender(gender);
+        existingPatient.setPhone(phone);
         existingPatient.setSeverity(severity);
-
 
         patientRegistry.update(
                 id,
@@ -865,9 +984,10 @@ public class PatientPanel extends JPanel {
                     new Object[]{
 
                             patient.getId(),
-
                             patient.getName(),
-
+                            patient.getAge(),
+                            patient.getGender(),
+                            patient.getPhone(),
                             patient.getSeverity()
                     }
             );
@@ -909,6 +1029,20 @@ public class PatientPanel extends JPanel {
 
             nameField.setText(
                     patient.getName()
+            );
+
+            ageField.setText(
+                    String.valueOf(
+                            patient.getAge()
+                    )
+            );
+
+            genderField.setText(
+                    patient.getGender()
+            );
+
+            phoneField.setText(
+                    patient.getPhone()
             );
 
             severityField.setText(
@@ -969,6 +1103,12 @@ public class PatientPanel extends JPanel {
         idField.setText("");
 
         nameField.setText("");
+
+        ageField.setText("");
+
+        genderField.setText("");
+
+        phoneField.setText("");
 
         severityField.setText("1");
     }
