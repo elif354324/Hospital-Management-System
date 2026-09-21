@@ -8,151 +8,168 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class PatientPanel extends JPanel {
 
-    private JTextField idField;
+    private final Color BACKGROUND = new Color(245, 247, 250);
+    private final Color CARD_BACKGROUND = Color.WHITE;
+    private final Color PRIMARY = new Color(37, 99, 235);
+    private final Color SUCCESS = new Color(22, 163, 74);
+    private final Color DANGER = new Color(220, 38, 38);
+    private final Color SECONDARY = new Color(107, 114, 128);
+    private final Color TEXT = new Color(31, 41, 55);
+    private final Color MUTED = new Color(107, 114, 128);
+    private final Color BORDER = new Color(229, 231, 235);
+
+    private final RecordRegistry patientRegistry;
+
+    // ============================================================
+    // PATIENT INFORMATION
+    // ============================================================
+
+    private JTextField nationalIdField;
     private JTextField nameField;
-    private JTextField ageField;
-    private JTextField genderField;
+    private JTextField birthDateField;
     private JTextField phoneField;
+    private JTextField emailField;
+    private JTextField addressField;
     private JTextField severityField;
 
+    private JComboBox<String> genderBox;
+    private JComboBox<String> bloodGroupBox;
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
+
     private JTextField searchField;
+
+    // ============================================================
+    // TABLE
+    // ============================================================
 
     private JTable patientTable;
     private DefaultTableModel tableModel;
 
-    private RecordRegistry patientRegistry;
+    private final DateTimeFormatter dateFormatter =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     public PatientPanel() {
 
-        patientRegistry =
-                HospitalData.getPatientRegistry();
+        patientRegistry = HospitalData.getPatientRegistry();
 
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(20, 20));
 
-        setBackground(Color.WHITE);
+        setBackground(BACKGROUND);
 
-        createHeader();
+        setBorder(
+                new EmptyBorder(
+                        24,
+                        24,
+                        24,
+                        24
+                )
+        );
 
-        createMainContent();
+        buildHeader();
+        buildMainContent();
 
         refreshTable();
     }
 
-    // =========================================
+    // ============================================================
     // HEADER
-    // =========================================
+    // ============================================================
 
-    private void createHeader() {
+    private void buildHeader() {
 
-        JPanel header =
-                new JPanel(new BorderLayout());
-
-        header.setBackground(Color.WHITE);
-
-        header.setBorder(
-                new EmptyBorder(25, 30, 15, 30)
-        );
-
-        JLabel title =
-                new JLabel("Patient Management");
-
-        title.setFont(
-                new Font("Arial", Font.BOLD, 30)
-        );
-
-        JLabel subtitle =
-                new JLabel(
-                        "Register, search, update and manage hospital patients"
-                );
-
-        subtitle.setFont(
-                new Font("Arial", Font.PLAIN, 15)
-        );
-
-        subtitle.setForeground(Color.GRAY);
-
-        JPanel textPanel =
+        JPanel headerPanel =
                 new JPanel();
 
-        textPanel.setBackground(Color.WHITE);
-
-        textPanel.setLayout(
+        headerPanel.setLayout(
                 new BoxLayout(
-                        textPanel,
+                        headerPanel,
                         BoxLayout.Y_AXIS
                 )
         );
 
-        textPanel.add(title);
+        headerPanel.setOpaque(false);
 
-        textPanel.add(
-                Box.createVerticalStrut(5)
-        );
+        JLabel title =
+                new JLabel("Hasta Yönetimi");
 
-        textPanel.add(subtitle);
-
-        header.add(
-                textPanel,
-                BorderLayout.WEST
-        );
-
-        add(
-                header,
-                BorderLayout.NORTH
-        );
-    }
-
-    // =========================================
-    // MAIN CONTENT
-    // =========================================
-
-    private void createMainContent() {
-
-        JPanel content =
-                new JPanel(
-                        new BorderLayout(20, 20)
-                );
-
-        content.setBackground(
-                new Color(245, 247, 250)
-        );
-
-        content.setBorder(
-                new EmptyBorder(
-                        20,
-                        30,
-                        30,
-                        30
+        title.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        28
                 )
         );
 
-        content.add(
-                createControlSection(),
-                BorderLayout.NORTH
+        title.setForeground(TEXT);
+
+        JLabel subtitle =
+                new JLabel(
+                        "Hasta kayıtlarını görüntüleyin ve yönetin."
+                );
+
+        subtitle.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        14
+                )
         );
 
-        content.add(
-                createTableSection(),
-                BorderLayout.CENTER
+        subtitle.setForeground(MUTED);
+
+        headerPanel.add(title);
+
+        headerPanel.add(
+                Box.createVerticalStrut(5)
         );
+
+        headerPanel.add(subtitle);
 
         add(
-                content,
-                BorderLayout.CENTER
+                headerPanel,
+                BorderLayout.NORTH
         );
     }
 
-    // =========================================
-    // TOP CONTROL SECTION
-    // =========================================
+    // ============================================================
+    // MAIN CONTENT
+    // ============================================================
 
-    private JPanel createControlSection() {
+    private void buildMainContent() {
 
-        JPanel panel =
+        JPanel contentPanel =
+                new JPanel();
+
+        contentPanel.setLayout(
+                new BoxLayout(
+                        contentPanel,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+        contentPanel.setBackground(
+                BACKGROUND
+        );
+
+        // ========================================================
+        // ÜST BÖLÜM
+        // ========================================================
+
+        JPanel topPanel =
                 new JPanel(
                         new GridLayout(
                                 1,
@@ -162,178 +179,378 @@ public class PatientPanel extends JPanel {
                         )
                 );
 
-        panel.setBackground(
-                new Color(245, 247, 250)
+        topPanel.setOpaque(false);
+
+        topPanel.add(
+                buildPatientInformationPanel()
         );
 
-        panel.add(
-                createPatientForm()
+        topPanel.add(
+                buildSearchAndActionsPanel()
         );
 
-        panel.add(
-                createSearchPanel()
+        topPanel.setAlignmentX(
+                Component.LEFT_ALIGNMENT
         );
 
-        return panel;
+        contentPanel.add(topPanel);
+
+        contentPanel.add(
+                Box.createVerticalStrut(20)
+        );
+
+        // ========================================================
+        // KAYITLI HASTALAR TABLOSU
+        // ========================================================
+
+        JPanel tablePanel =
+                buildPatientTablePanel();
+
+        tablePanel.setAlignmentX(
+                Component.LEFT_ALIGNMENT
+        );
+
+        tablePanel.setPreferredSize(
+                new Dimension(
+                        0,
+                        350
+                )
+        );
+
+        tablePanel.setMinimumSize(
+                new Dimension(
+                        0,
+                        300
+                )
+        );
+
+        tablePanel.setMaximumSize(
+                new Dimension(
+                        Integer.MAX_VALUE,
+                        450
+                )
+        );
+
+        contentPanel.add(tablePanel);
+
+        contentPanel.add(
+                Box.createVerticalStrut(20)
+        );
+
+        // ========================================================
+        // TÜM SAYFAYI SCROLL YAP
+        // ========================================================
+
+        JScrollPane pageScroll =
+                new JScrollPane(
+                        contentPanel
+                );
+
+        pageScroll.setBorder(null);
+
+        pageScroll.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+
+        pageScroll.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        );
+
+        pageScroll.getVerticalScrollBar()
+                .setUnitIncrement(16);
+
+        pageScroll.getVerticalScrollBar()
+                .setBlockIncrement(80);
+
+        pageScroll.getViewport()
+                .setBackground(BACKGROUND);
+
+        add(
+                pageScroll,
+                BorderLayout.CENTER
+        );
     }
 
-    // =========================================
-    // PATIENT FORM
-    // =========================================
+    // ============================================================
+    // PATIENT INFORMATION PANEL
+    // ============================================================
 
-    private JPanel createPatientForm() {
+    private JPanel buildPatientInformationPanel() {
 
         JPanel card =
-                new JPanel();
+                createCardPanel();
 
         card.setLayout(
+                new BorderLayout(
+                        0,
+                        15
+                )
+        );
+
+        JLabel title =
+                new JLabel("Hasta Bilgileri");
+
+        title.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        18
+                )
+        );
+
+        title.setForeground(TEXT);
+
+        card.add(
+                title,
+                BorderLayout.NORTH
+        );
+
+        JPanel form =
+                new JPanel();
+
+        form.setLayout(
                 new BoxLayout(
-                        card,
+                        form,
                         BoxLayout.Y_AXIS
                 )
         );
 
-        card.setBackground(Color.WHITE);
+        form.setOpaque(false);
 
-        card.setBorder(
-                createCardBorder()
-        );
+        // --------------------------------------------------------
+        // T.C. KİMLİK NO
+        // --------------------------------------------------------
 
-        JLabel title =
-                new JLabel("Patient Information");
+        nationalIdField =
+                createTextField();
 
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        20
+        form.add(
+                createFormField(
+                        "T.C. Kimlik No",
+                        nationalIdField
                 )
         );
 
-        card.add(title);
-
-        card.add(
-                Box.createVerticalStrut(15)
+        form.add(
+                Box.createVerticalStrut(10)
         );
 
-        // ID
-        card.add(
-                new JLabel("Patient ID")
-        );
-
-        idField =
-                new JTextField();
-
-        prepareTextField(idField);
-
-        card.add(idField);
-
-        card.add(
-                Box.createVerticalStrut(8)
-        );
-
-        // NAME
-        card.add(
-                new JLabel("Patient Name")
-        );
+        // --------------------------------------------------------
+        // AD SOYAD
+        // --------------------------------------------------------
 
         nameField =
-                new JTextField();
+                createTextField();
 
-        prepareTextField(nameField);
-
-        card.add(nameField);
-
-        card.add(
-                Box.createVerticalStrut(8)
+        form.add(
+                createFormField(
+                        "Ad Soyad",
+                        nameField
+                )
         );
 
-        // AGE
-        card.add(
-                new JLabel("Age")
+        form.add(
+                Box.createVerticalStrut(10)
         );
 
-        ageField =
-                new JTextField();
+        // --------------------------------------------------------
+        // DOĞUM TARİHİ
+        // --------------------------------------------------------
 
-        prepareTextField(ageField);
+        birthDateField =
+                createTextField();
 
-        card.add(ageField);
-
-        card.add(
-                Box.createVerticalStrut(8)
+        birthDateField.setToolTipText(
+                "Örnek: 15.04.2004"
         );
 
-        // GENDER
-        card.add(
-                new JLabel("Gender")
+        form.add(
+                createFormField(
+                        "Doğum Tarihi",
+                        birthDateField
+                )
         );
 
-        genderField =
-                new JTextField();
-
-        prepareTextField(genderField);
-
-        card.add(genderField);
-
-        card.add(
-                Box.createVerticalStrut(8)
+        form.add(
+                Box.createVerticalStrut(10)
         );
 
-        // PHONE
-        card.add(
-                new JLabel("Phone")
+        // --------------------------------------------------------
+        // CİNSİYET
+        // --------------------------------------------------------
+
+        genderBox =
+                new JComboBox<>(
+                        new String[]{
+                                "Seçiniz",
+                                "Kadın",
+                                "Erkek",
+                                "Belirtilmemiş"
+                        }
+                );
+
+        styleComboBox(genderBox);
+
+        form.add(
+                createFormField(
+                        "Cinsiyet",
+                        genderBox
+                )
         );
+
+        form.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // TELEFON
+        // --------------------------------------------------------
 
         phoneField =
-                new JTextField();
+                createTextField();
 
-        prepareTextField(phoneField);
-
-        card.add(phoneField);
-
-        card.add(
-                Box.createVerticalStrut(8)
+        form.add(
+                createFormField(
+                        "Telefon",
+                        phoneField
+                )
         );
 
-        // SEVERITY
-        card.add(
-                new JLabel("Severity (1-10)")
+        form.add(
+                Box.createVerticalStrut(10)
         );
+
+        // --------------------------------------------------------
+        // E-POSTA
+        // --------------------------------------------------------
+
+        emailField =
+                createTextField();
+
+        form.add(
+                createFormField(
+                        "E-posta",
+                        emailField
+                )
+        );
+
+        form.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // ADRES
+        // --------------------------------------------------------
+
+        addressField =
+                createTextField();
+
+        form.add(
+                createFormField(
+                        "Adres",
+                        addressField
+                )
+        );
+
+        form.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // KAN GRUBU
+        // --------------------------------------------------------
+
+        bloodGroupBox =
+                new JComboBox<>(
+                        new String[]{
+                                "Seçiniz",
+                                "A+",
+                                "A-",
+                                "B+",
+                                "B-",
+                                "AB+",
+                                "AB-",
+                                "0+",
+                                "0-"
+                        }
+                );
+
+        styleComboBox(bloodGroupBox);
+
+        form.add(
+                createFormField(
+                        "Kan Grubu",
+                        bloodGroupBox
+                )
+        );
+
+        form.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // ŞİDDET
+        // --------------------------------------------------------
 
         severityField =
-                new JTextField();
-
-        prepareTextField(severityField);
+                createTextField();
 
         severityField.setText("1");
 
-        card.add(severityField);
+        form.add(
+                createFormField(
+                        "Öncelik Şiddeti (1-10)",
+                        severityField
+                )
+        );
 
         card.add(
-                Box.createVerticalStrut(15)
+                form,
+                BorderLayout.CENTER
         );
+
+        // --------------------------------------------------------
+        // BUTTONS
+        // --------------------------------------------------------
 
         JPanel buttonPanel =
                 new JPanel(
                         new GridLayout(
                                 1,
                                 3,
-                                10,
+                                8,
                                 0
                         )
                 );
 
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setOpaque(false);
 
         JButton addButton =
-                new JButton("Add");
+                createButton(
+                        "Hasta Ekle",
+                        SUCCESS
+                );
 
         JButton updateButton =
-                new JButton("Update");
+                createButton(
+                        "Güncelle",
+                        PRIMARY
+                );
 
         JButton clearButton =
-                new JButton("Clear");
+                createButton(
+                        "Temizle",
+                        SECONDARY
+                );
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(clearButton);
+
+        card.add(
+                buttonPanel,
+                BorderLayout.SOUTH
+        );
 
         addButton.addActionListener(
                 e -> addPatient()
@@ -344,101 +561,228 @@ public class PatientPanel extends JPanel {
         );
 
         clearButton.addActionListener(
-                e -> clearFields()
+                e -> clearForm()
         );
-
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(clearButton);
-
-        card.add(buttonPanel);
 
         return card;
     }
 
-    // =========================================
-    // SEARCH PANEL
-    // =========================================
+    // ============================================================
+    // SEARCH & ACTIONS PANEL
+    // ============================================================
 
-    private JPanel createSearchPanel() {
+    private JPanel buildSearchAndActionsPanel() {
 
         JPanel card =
-                new JPanel();
+                createCardPanel();
 
         card.setLayout(
+                new BorderLayout(
+                        0,
+                        15
+                )
+        );
+
+        JLabel title =
+                new JLabel("Arama ve İşlemler");
+
+        title.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        18
+                )
+        );
+
+        title.setForeground(TEXT);
+
+        card.add(
+                title,
+                BorderLayout.NORTH
+        );
+
+        JPanel content =
+                new JPanel();
+
+        content.setLayout(
                 new BoxLayout(
-                        card,
+                        content,
                         BoxLayout.Y_AXIS
                 )
         );
 
-        card.setBackground(Color.WHITE);
+        content.setOpaque(false);
 
-        card.setBorder(
-                createCardBorder()
-        );
-
-        JLabel title =
-                new JLabel("Search & Actions");
-
-        title.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        20
-                )
-        );
-
-        card.add(title);
-
-        card.add(
-                Box.createVerticalStrut(20)
-        );
-
-        card.add(
-                new JLabel("Patient ID")
-        );
+        // --------------------------------------------------------
+        // SEARCH FIELD
+        // --------------------------------------------------------
 
         searchField =
-                new JTextField();
+                createTextField();
 
-        prepareTextField(searchField);
-
-        card.add(searchField);
-
-        card.add(
-                Box.createVerticalStrut(20)
+        /*
+         * SADECE ARAMA ALANINI NORMAL BOYUTTA TUTUYORUZ.
+         *
+         * Genişlik : 250 px
+         * Yükseklik: 36 px
+         */
+        searchField.setPreferredSize(
+                new Dimension(
+                        250,
+                        36
+                )
         );
+
+        searchField.setMinimumSize(
+                new Dimension(
+                        250,
+                        36
+                )
+        );
+
+        searchField.setMaximumSize(
+                new Dimension(
+                        250,
+                        36
+                )
+        );
+
+        searchField.setToolTipText(
+                "11 haneli T.C. Kimlik No"
+        );
+
+        /*
+         * createFormField() normalde BoxLayout tarafından
+         * genişletilebildiği için arama alanını ayrı bir
+         * panel içinde sabitliyoruz.
+         */
+        JPanel searchFieldPanel =
+                createFormField(
+                        "T.C. Kimlik No ile Ara",
+                        searchField
+                );
+
+        searchFieldPanel.setPreferredSize(
+                new Dimension(
+                        250,
+                        61
+                )
+        );
+
+        searchFieldPanel.setMinimumSize(
+                new Dimension(
+                        250,
+                        61
+                )
+        );
+
+        searchFieldPanel.setMaximumSize(
+                new Dimension(
+                        250,
+                        61
+                )
+        );
+
+        searchFieldPanel.setAlignmentX(
+                Component.LEFT_ALIGNMENT
+        );
+
+        content.add(
+                searchFieldPanel
+        );
+
+        content.add(
+                Box.createVerticalStrut(15)
+        );
+
+        // --------------------------------------------------------
+        // SEARCH BUTTON
+        // --------------------------------------------------------
 
         JButton searchButton =
-                new JButton("Search Patient");
+                createButton(
+                        "Hasta Ara",
+                        PRIMARY
+                );
+
+        content.add(
+                searchButton
+        );
+
+        content.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // DELETE BUTTON
+        // --------------------------------------------------------
 
         JButton deleteButton =
-                new JButton("Delete Patient");
+                createButton(
+                        "Hastayı Sil",
+                        DANGER
+                );
+
+        content.add(
+                deleteButton
+        );
+
+        content.add(
+                Box.createVerticalStrut(10)
+        );
+
+        // --------------------------------------------------------
+        // REFRESH BUTTON
+        // --------------------------------------------------------
 
         JButton refreshButton =
-                new JButton("Refresh List");
+                createButton(
+                        "Listeyi Yenile",
+                        SECONDARY
+                );
 
-        searchButton.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        40
+        content.add(
+                refreshButton
+        );
+
+        content.add(
+                Box.createVerticalGlue()
+        );
+
+        // --------------------------------------------------------
+        // INFORMATION
+        // --------------------------------------------------------
+
+        JLabel info =
+                new JLabel(
+                        "<html>"
+                                + "<b>Bilgi:</b><br>"
+                                + "Hasta arama, güncelleme ve silme "
+                                + "işlemleri T.C. Kimlik No üzerinden "
+                                + "gerçekleştirilir."
+                                + "</html>"
+                );
+
+        info.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        12
                 )
         );
 
-        deleteButton.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        40
-                )
+        info.setForeground(MUTED);
+
+        content.add(info);
+
+        card.add(
+                content,
+                BorderLayout.CENTER
         );
 
-        refreshButton.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        40
-                )
-        );
+        // --------------------------------------------------------
+        // ACTION LISTENERS
+        // --------------------------------------------------------
 
         searchButton.addActionListener(
                 e -> searchPatient()
@@ -450,42 +794,64 @@ public class PatientPanel extends JPanel {
 
         refreshButton.addActionListener(
                 e -> {
+
                     refreshTable();
-                    clearFields();
-                    searchField.setText("");
+                    clearSearch();
+
                 }
         );
 
-        card.add(searchButton);
-
-        card.add(
-                Box.createVerticalStrut(10)
+        searchField.addActionListener(
+                e -> searchPatient()
         );
-
-        card.add(deleteButton);
-
-        card.add(
-                Box.createVerticalStrut(10)
-        );
-
-        card.add(refreshButton);
 
         return card;
     }
 
-    // =========================================
-    // TABLE
-    // =========================================
+    // ============================================================
+    // PATIENT TABLE
+    // ============================================================
 
-    private JScrollPane createTableSection() {
+    private JPanel buildPatientTablePanel() {
+
+        JPanel card =
+                createCardPanel();
+
+        card.setLayout(
+                new BorderLayout(
+                        0,
+                        12
+                )
+        );
+
+        JLabel title =
+                new JLabel("Kayıtlı Hastalar");
+
+        title.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        18
+                )
+        );
+
+        title.setForeground(TEXT);
+
+        card.add(
+                title,
+                BorderLayout.NORTH
+        );
 
         String[] columns = {
-                "Patient ID",
-                "Patient Name",
-                "Age",
-                "Gender",
-                "Phone",
-                "Severity"
+
+                "T.C. Kimlik No",
+                "Hasta",
+                "Yaş",
+                "Cinsiyet",
+                "Telefon",
+                "Kan Grubu",
+                "Şiddet"
+
         };
 
         tableModel =
@@ -497,8 +863,8 @@ public class PatientPanel extends JPanel {
                     @Override
                     public boolean isCellEditable(
                             int row,
-                            int column
-                    ) {
+                            int column) {
+
                         return false;
                     }
                 };
@@ -506,526 +872,568 @@ public class PatientPanel extends JPanel {
         patientTable =
                 new JTable(tableModel);
 
-        patientTable.setRowHeight(32);
+        patientTable.setRowHeight(34);
 
         patientTable.setFont(
                 new Font(
-                        "Arial",
+                        "Segoe UI",
                         Font.PLAIN,
-                        14
+                        13
                 )
         );
 
         patientTable.getTableHeader()
                 .setFont(
                         new Font(
-                                "Arial",
+                                "Segoe UI",
                                 Font.BOLD,
-                                14
+                                13
                         )
                 );
+
+        patientTable.getTableHeader()
+                .setForeground(TEXT);
+
+        patientTable.getTableHeader()
+                .setBackground(
+                        new Color(
+                                243,
+                                244,
+                                246
+                        )
+                );
+
+        patientTable.setGridColor(BORDER);
+
+        patientTable.setShowVerticalLines(false);
 
         patientTable.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
         );
 
-        patientTable.getSelectionModel()
-                .addListSelectionListener(e -> {
-
-                    if (!e.getValueIsAdjusting()) {
-                        loadSelectedPatient();
-                    }
-                });
-
-        JScrollPane scrollPane =
+        /*
+         * TABLONUN KENDİ SCROLL'U
+         */
+        JScrollPane tableScroll =
                 new JScrollPane(
                         patientTable
                 );
 
-        scrollPane.setBorder(
-                BorderFactory.createTitledBorder(
-                        "Registered Patients"
+        tableScroll.setBorder(
+                BorderFactory.createLineBorder(
+                        BORDER
                 )
         );
 
-        return scrollPane;
+        tableScroll.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        );
+
+        tableScroll.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        );
+
+        card.add(
+                tableScroll,
+                BorderLayout.CENTER
+        );
+
+        // ========================================================
+        // TABLE SELECTION
+        // ========================================================
+
+        patientTable.getSelectionModel()
+                .addListSelectionListener(
+                        e -> {
+
+                            if (!e.getValueIsAdjusting()) {
+
+                                loadSelectedPatient();
+                            }
+                        }
+                );
+
+        return card;
     }
 
-    // =========================================
+    // ============================================================
     // ADD PATIENT
-    // =========================================
+    // ============================================================
 
     private void addPatient() {
 
-        String id =
-                idField.getText().trim();
+        String nationalId =
+                nationalIdField
+                        .getText()
+                        .trim();
 
         String name =
-                nameField.getText().trim();
+                nameField
+                        .getText()
+                        .trim();
 
-        String ageText =
-                ageField.getText().trim();
+        if (!validateRequiredFields()) {
+            return;
+        }
 
-        String gender =
-                genderField.getText().trim();
+        if (!validateNationalId(
+                nationalId
+        )) {
+            return;
+        }
 
-        String phone =
-                phoneField.getText().trim();
+        if (patientRegistry
+                .containsNationalId(
+                        nationalId
+                )) {
 
-        String severityText =
-                severityField.getText().trim();
-
-        if (id.isEmpty() || name.isEmpty()) {
-
-            showMessage(
-                    "Patient ID and Name are required.",
-                    "Missing Information",
-                    JOptionPane.WARNING_MESSAGE
+            showError(
+                    "Bu T.C. Kimlik No ile kayıtlı bir hasta zaten mevcut."
             );
 
             return;
         }
 
-        if (patientRegistry.get(id) != null) {
+        LocalDate birthDate =
+                parseBirthDate();
 
-            showMessage(
-                    "A patient with this ID already exists.",
-                    "Duplicate Patient",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
+        if (birthDate == null) {
             return;
         }
 
-        int age;
+        int severity =
+                parseSeverity();
 
-        try {
-
-            age =
-                    Integer.parseInt(ageText);
-
-        } catch (NumberFormatException e) {
-
-            showMessage(
-                    "Age must be a valid number.",
-                    "Invalid Age",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
+        if (severity == -1) {
             return;
         }
 
-        if (age < 0 || age > 150) {
-
-            showMessage(
-                    "Age must be between 0 and 150.",
-                    "Invalid Age",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (gender.isEmpty()) {
-
-            showMessage(
-                    "Gender is required.",
-                    "Missing Information",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        if (phone.isEmpty()) {
-
-            showMessage(
-                    "Phone number is required.",
-                    "Missing Information",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        int severity;
-
-        try {
-
-            severity =
-                    Integer.parseInt(
-                            severityText
-                    );
-
-        } catch (NumberFormatException e) {
-
-            showMessage(
-                    "Severity must be a number between 1 and 10.",
-                    "Invalid Severity",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (severity < 1 || severity > 10) {
-
-            showMessage(
-                    "Severity must be between 1 and 10.",
-                    "Invalid Severity",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
+        // Internal ID is generated automatically.
+        // User never enters this ID.
+        String internalId =
+                generatePatientId();
 
         Patient patient =
                 new Patient(
-                        id,
+                        internalId,
                         name,
-                        age,
-                        gender,
-                        phone,
                         severity
                 );
 
-        boolean success =
-                patientRegistry.add(patient);
+        patient.setNationalId(
+                nationalId
+        );
 
-        if (success) {
+        patient.setBirthDate(
+                birthDate
+        );
 
-            refreshTable();
+        patient.setGender(
+                getSelectedValue(
+                        genderBox
+                )
+        );
 
-            clearFields();
+        patient.setPhone(
+                phoneField
+                        .getText()
+                        .trim()
+        );
 
-            showMessage(
-                    "Patient registered successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+        patient.setEmail(
+                emailField
+                        .getText()
+                        .trim()
+        );
 
-        } else {
+        patient.setAddress(
+                addressField
+                        .getText()
+                        .trim()
+        );
 
-            showMessage(
-                    "Patient could not be registered.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
-    }
+        patient.setBloodGroup(
+                getSelectedValue(
+                        bloodGroupBox
+                )
+        );
 
-    // =========================================
-    // SEARCH PATIENT
-    // =========================================
+        boolean added =
+                patientRegistry.add(
+                        patient
+                );
 
-    private void searchPatient() {
+        if (!added) {
 
-        String id =
-                searchField.getText().trim();
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Enter a Patient ID to search.",
-                    "Search",
-                    JOptionPane.WARNING_MESSAGE
+            showError(
+                    "Hasta kaydı oluşturulamadı."
             );
 
             return;
         }
 
-        Patient patient =
-                patientRegistry.get(id);
-
-        if (patient == null) {
-
-            showMessage(
-                    "Patient not found.",
-                    "Search Result",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            return;
-        }
-
-        loadPatientIntoFields(patient);
-
-        highlightPatient(
-                patient.getId()
+        showSuccess(
+                "Hasta başarıyla kaydedildi."
         );
 
-        showMessage(
-                "Patient found successfully.",
-                "Search Result",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        clearForm();
+        refreshTable();
     }
 
-    // =========================================
+    // ============================================================
     // UPDATE PATIENT
-    // =========================================
+    // ============================================================
 
     private void updatePatient() {
 
-        String id =
-                idField.getText().trim();
+        String nationalId =
+                nationalIdField
+                        .getText()
+                        .trim();
 
-        String name =
-                nameField.getText().trim();
-
-        String ageText =
-                ageField.getText().trim();
-
-        String gender =
-                genderField.getText().trim();
-
-        String phone =
-                phoneField.getText().trim();
-
-        String severityText =
-                severityField.getText().trim();
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Select or search a patient first.",
-                    "Update",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        if (name.isEmpty()) {
-
-            showMessage(
-                    "Patient name is required.",
-                    "Update Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
+        if (!validateNationalId(
+                nationalId
+        )) {
             return;
         }
 
         Patient existingPatient =
-                patientRegistry.get(id);
+                patientRegistry
+                        .getByNationalId(
+                                nationalId
+                        );
 
         if (existingPatient == null) {
 
-            showMessage(
-                    "Patient not found.",
-                    "Update",
-                    JOptionPane.ERROR_MESSAGE
+            showError(
+                    "Bu T.C. Kimlik No ile kayıtlı hasta bulunamadı."
             );
 
             return;
         }
 
-        int age;
-
-        try {
-
-            age =
-                    Integer.parseInt(ageText);
-
-        } catch (NumberFormatException e) {
-
-            showMessage(
-                    "Age must be a valid number.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
+        if (!validateRequiredFields()) {
             return;
         }
 
-        if (age < 0 || age > 150) {
+        LocalDate birthDate =
+                parseBirthDate();
 
-            showMessage(
-                    "Age must be between 0 and 150.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
+        if (birthDate == null) {
             return;
         }
 
-        if (gender.isEmpty()) {
+        int severity =
+                parseSeverity();
 
-            showMessage(
-                    "Gender is required.",
-                    "Update Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
+        if (severity == -1) {
             return;
         }
 
-        if (phone.isEmpty()) {
-
-            showMessage(
-                    "Phone number is required.",
-                    "Update Error",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            return;
-        }
-
-        int severity;
-
-        try {
-
-            severity =
-                    Integer.parseInt(
-                            severityText
-                    );
-
-        } catch (NumberFormatException e) {
-
-            showMessage(
-                    "Severity must be a number between 1 and 10.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        if (severity < 1 || severity > 10) {
-
-            showMessage(
-                    "Severity must be between 1 and 10.",
-                    "Update Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-        int confirmation =
-                JOptionPane.showConfirmDialog(
-                        this,
-                        "Update patient information?\n\n"
-                                + "Patient: "
-                                + name
-                                + "\nID: "
-                                + id,
-                        "Confirm Update",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
+        /*
+         * Keep the internal ID of the existing patient.
+         * User never sees or enters it.
+         */
+        Patient updatedPatient =
+                new Patient(
+                        existingPatient.getId(),
+                        nameField
+                                .getText()
+                                .trim(),
+                        severity
                 );
 
-        if (confirmation != JOptionPane.YES_OPTION) {
+        updatedPatient.setNationalId(
+                nationalId
+        );
+
+        updatedPatient.setBirthDate(
+                birthDate
+        );
+
+        updatedPatient.setGender(
+                getSelectedValue(
+                        genderBox
+                )
+        );
+
+        updatedPatient.setPhone(
+                phoneField
+                        .getText()
+                        .trim()
+        );
+
+        updatedPatient.setEmail(
+                emailField
+                        .getText()
+                        .trim()
+        );
+
+        updatedPatient.setAddress(
+                addressField
+                        .getText()
+                        .trim()
+        );
+
+        updatedPatient.setBloodGroup(
+                getSelectedValue(
+                        bloodGroupBox
+                )
+        );
+
+        boolean updated =
+                patientRegistry
+                        .updateByNationalId(
+                                nationalId,
+                                updatedPatient
+                        );
+
+        if (!updated) {
+
+            showError(
+                    "Hasta bilgileri güncellenemedi."
+            );
+
             return;
         }
 
-        existingPatient.setName(name);
-        existingPatient.setAge(age);
-        existingPatient.setGender(gender);
-        existingPatient.setPhone(phone);
-        existingPatient.setSeverity(severity);
-
-        patientRegistry.update(
-                id,
-                existingPatient
+        showSuccess(
+                "Hasta bilgileri başarıyla güncellendi."
         );
 
+        clearForm();
         refreshTable();
-
-        highlightPatient(id);
-
-        showMessage(
-                "Patient updated successfully!",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE
-        );
     }
 
-    // =========================================
+    // ============================================================
     // DELETE PATIENT
-    // =========================================
+    // ============================================================
 
     private void deletePatient() {
 
-        String id =
-                searchField.getText().trim();
+        String nationalId =
+                searchField
+                        .getText()
+                        .trim();
 
-        if (id.isEmpty()) {
-            id = idField.getText().trim();
-        }
-
-        if (id.isEmpty()) {
-
-            showMessage(
-                    "Select a patient or enter an ID.",
-                    "Delete",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
+        if (!validateNationalId(
+                nationalId
+        )) {
             return;
         }
 
         Patient patient =
-                patientRegistry.get(id);
+                patientRegistry
+                        .getByNationalId(
+                                nationalId
+                        );
 
         if (patient == null) {
 
-            showMessage(
-                    "Patient not found.",
-                    "Delete Error",
-                    JOptionPane.ERROR_MESSAGE
+            showError(
+                    "Bu T.C. Kimlik No ile kayıtlı hasta bulunamadı."
             );
 
             return;
         }
 
-        int confirmation =
+        int result =
                 JOptionPane.showConfirmDialog(
                         this,
-                        "Are you sure you want to delete patient:\n\n"
+                        "Hasta kaydı silinecek.\n\n"
+                                + "Hasta: "
                                 + patient.getName()
-                                + "\nID: "
-                                + id,
-                        "Confirm Delete",
+                                + "\n"
+                                + "T.C. Kimlik No: "
+                                + maskNationalId(
+                                nationalId
+                        )
+                                + "\n\n"
+                                + "Devam etmek istiyor musunuz?",
+                        "Hasta Kaydını Sil",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
 
-        if (confirmation != JOptionPane.YES_OPTION) {
+        if (result != JOptionPane.YES_OPTION) {
             return;
         }
 
-        boolean success =
-                patientRegistry.delete(id);
+        boolean deleted =
+                patientRegistry
+                        .deleteByNationalId(
+                                nationalId
+                        );
 
-        if (success) {
+        if (!deleted) {
 
-            refreshTable();
-
-            clearFields();
-
-            searchField.setText("");
-
-            showMessage(
-                    "Patient deleted successfully.",
-                    "Deleted",
-                    JOptionPane.INFORMATION_MESSAGE
+            showError(
+                    "Hasta kaydı silinemedi."
             );
 
-        } else {
+            return;
+        }
 
-            showMessage(
-                    "Patient could not be deleted.",
-                    "Delete Error",
-                    JOptionPane.ERROR_MESSAGE
+        showSuccess(
+                "Hasta kaydı başarıyla silindi."
+        );
+
+        clearForm();
+        clearSearch();
+        refreshTable();
+    }
+
+    // ============================================================
+    // SEARCH PATIENT
+    // ============================================================
+
+    private void searchPatient() {
+
+        String nationalId =
+                searchField
+                        .getText()
+                        .trim();
+
+        if (!validateNationalId(
+                nationalId
+        )) {
+            return;
+        }
+
+        Patient patient =
+                patientRegistry
+                        .getByNationalId(
+                                nationalId
+                        );
+
+        if (patient == null) {
+
+            showError(
+                    "Bu T.C. Kimlik No ile kayıtlı hasta bulunamadı."
+            );
+
+            return;
+        }
+
+        loadPatientIntoFields(
+                patient
+        );
+
+        highlightPatient(
+                patient
+        );
+    }
+
+    // ============================================================
+    // LOAD SELECTED PATIENT
+    // ============================================================
+
+    private void loadSelectedPatient() {
+
+        int selectedRow =
+                patientTable
+                        .getSelectedRow();
+
+        if (selectedRow < 0) {
+            return;
+        }
+
+        List<Patient> patients =
+                patientRegistry
+                        .getAllPatients();
+
+        if (selectedRow >= patients.size()) {
+            return;
+        }
+
+        Patient patient =
+                patients.get(
+                        selectedRow
+                );
+
+        if (patient != null) {
+
+            loadPatientIntoFields(
+                    patient
             );
         }
     }
 
-    // =========================================
+    // ============================================================
+    // LOAD PATIENT INTO FORM
+    // ============================================================
+
+    private void loadPatientIntoFields(
+            Patient patient) {
+
+        if (patient == null) {
+            return;
+        }
+
+        nationalIdField.setText(
+                safeValue(
+                        patient.getNationalId()
+                )
+        );
+
+        nameField.setText(
+                safeValue(
+                        patient.getName()
+                )
+        );
+
+        if (patient.getBirthDate() != null) {
+
+            birthDateField.setText(
+                    patient.getBirthDate()
+                            .format(
+                                    dateFormatter
+                            )
+            );
+
+        } else {
+
+            birthDateField.setText("");
+        }
+
+        selectComboValue(
+                genderBox,
+                patient.getGender()
+        );
+
+        phoneField.setText(
+                safeValue(
+                        patient.getPhone()
+                )
+        );
+
+        emailField.setText(
+                safeValue(
+                        patient.getEmail()
+                )
+        );
+
+        addressField.setText(
+                safeValue(
+                        patient.getAddress()
+                )
+        );
+
+        selectComboValue(
+                bloodGroupBox,
+                patient.getBloodGroup()
+        );
+
+        severityField.setText(
+                String.valueOf(
+                        patient.getSeverity()
+                )
+        );
+    }
+
+    // ============================================================
     // REFRESH TABLE
-    // =========================================
+    // ============================================================
 
     private void refreshTable() {
 
@@ -1036,206 +1444,710 @@ public class PatientPanel extends JPanel {
         tableModel.setRowCount(0);
 
         List<Patient> patients =
-                patientRegistry.getAllPatients();
+                patientRegistry
+                        .getAllPatients();
 
         for (Patient patient : patients) {
 
-            tableModel.addRow(
-                    new Object[]{
-                            patient.getId(),
-                            patient.getName(),
-                            patient.getAge(),
-                            patient.getGender(),
-                            patient.getPhone(),
-                            patient.getSeverity()
-                    }
-            );
+            if (patient == null) {
+                continue;
+            }
+
+            Object[] row = {
+
+                    maskNationalId(
+                            patient.getNationalId()
+                    ),
+
+                    maskName(
+                            patient.getName()
+                    ),
+
+                    patient.getAge(),
+
+                    safeValue(
+                            patient.getGender()
+                    ),
+
+                    maskPhone(
+                            patient.getPhone()
+                    ),
+
+                    safeValue(
+                            patient.getBloodGroup()
+                    ),
+
+                    patient.getSeverity()
+            };
+
+            tableModel.addRow(row);
         }
     }
 
-    // =========================================
-    // SELECT TABLE ROW
-    // =========================================
-
-    private void loadSelectedPatient() {
-
-        int row =
-                patientTable.getSelectedRow();
-
-        if (row == -1) {
-            return;
-        }
-
-        Object value =
-                tableModel.getValueAt(
-                        row,
-                        0
-                );
-
-        if (value == null) {
-            return;
-        }
-
-        String id =
-                value.toString();
-
-        Patient patient =
-                patientRegistry.get(id);
-
-        if (patient != null) {
-
-            loadPatientIntoFields(patient);
-
-            searchField.setText(
-                    patient.getId()
-            );
-        }
-    }
-
-    // =========================================
-    // LOAD PATIENT
-    // =========================================
-
-    private void loadPatientIntoFields(
-            Patient patient
-    ) {
-
-        idField.setText(
-                patient.getId()
-        );
-
-        nameField.setText(
-                patient.getName()
-        );
-
-        ageField.setText(
-                String.valueOf(
-                        patient.getAge()
-                )
-        );
-
-        genderField.setText(
-                patient.getGender()
-        );
-
-        phoneField.setText(
-                patient.getPhone()
-        );
-
-        severityField.setText(
-                String.valueOf(
-                        patient.getSeverity()
-                )
-        );
-    }
-
-    // =========================================
+    // ============================================================
     // HIGHLIGHT PATIENT
-    // =========================================
+    // ============================================================
 
     private void highlightPatient(
-            String patientId
-    ) {
+            Patient targetPatient) {
 
-        if (patientId == null) {
+        if (targetPatient == null) {
             return;
         }
 
-        for (
-                int i = 0;
-                i < tableModel.getRowCount();
-                i++
-        ) {
+        List<Patient> patients =
+                patientRegistry
+                        .getAllPatients();
 
-            Object value =
-                    tableModel.getValueAt(
-                            i,
-                            0
-                    );
+        for (int i = 0;
+             i < patients.size();
+             i++) {
 
-            if (value != null
-                    && value.toString()
-                    .equals(patientId)) {
+            Patient patient =
+                    patients.get(i);
 
-                patientTable.setRowSelectionInterval(
-                        i,
-                        i
-                );
+            if (patient != null
+                    && patient.getId()
+                    .equals(
+                            targetPatient.getId()
+                    )) {
 
-                patientTable.scrollRectToVisible(
-                        patientTable
-                                .getCellRect(
-                                        i,
-                                        0,
-                                        true
-                                )
-                );
+                patientTable
+                        .setRowSelectionInterval(
+                                i,
+                                i
+                        );
+
+                patientTable
+                        .scrollRectToVisible(
+                                patientTable
+                                        .getCellRect(
+                                                i,
+                                                0,
+                                                true
+                                        )
+                        );
 
                 break;
             }
         }
     }
 
-    // =========================================
-    // CLEAR
-    // =========================================
+    // ============================================================
+    // VALIDATION
+    // ============================================================
 
-    private void clearFields() {
+    private boolean validateRequiredFields() {
 
-        idField.setText("");
+        if (nationalIdField
+                .getText()
+                .trim()
+                .isEmpty()) {
 
-        nameField.setText("");
+            showError(
+                    "T.C. Kimlik No boş bırakılamaz."
+            );
 
-        ageField.setText("");
+            nationalIdField.requestFocus();
 
-        genderField.setText("");
+            return false;
+        }
 
-        phoneField.setText("");
+        if (nameField
+                .getText()
+                .trim()
+                .isEmpty()) {
 
-        severityField.setText("1");
+            showError(
+                    "Ad Soyad boş bırakılamaz."
+            );
 
-        if (patientTable != null) {
-            patientTable.clearSelection();
+            nameField.requestFocus();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateNationalId(
+            String nationalId) {
+
+        if (nationalId == null
+                || nationalId.trim().isEmpty()) {
+
+            showError(
+                    "T.C. Kimlik No giriniz."
+            );
+
+            return false;
+        }
+
+        if (!nationalId.matches(
+                "\\d{11}"
+        )) {
+
+            showError(
+                    "T.C. Kimlik No 11 haneli olmalıdır."
+            );
+
+            return false;
+        }
+
+        if (nationalId.charAt(0) == '0') {
+
+            showError(
+                    "T.C. Kimlik No 0 ile başlayamaz."
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private LocalDate parseBirthDate() {
+
+        String value =
+                birthDateField
+                        .getText()
+                        .trim();
+
+        if (value.isEmpty()) {
+
+            showError(
+                    "Doğum tarihi giriniz.\n"
+                            + "Örnek: 15.04.2004"
+            );
+
+            birthDateField.requestFocus();
+
+            return null;
+        }
+
+        try {
+
+            LocalDate date =
+                    LocalDate.parse(
+                            value,
+                            dateFormatter
+                    );
+
+            if (date.isAfter(
+                    LocalDate.now()
+            )) {
+
+                showError(
+                        "Doğum tarihi gelecekte olamaz."
+                );
+
+                return null;
+            }
+
+            return date;
+
+        } catch (
+                DateTimeParseException e) {
+
+            showError(
+                    "Doğum tarihi geçersiz.\n"
+                            + "Format: GG.AA.YYYY\n"
+                            + "Örnek: 15.04.2004"
+            );
+
+            return null;
         }
     }
 
-    // =========================================
-    // HELPER METHODS
-    // =========================================
+    private int parseSeverity() {
 
-    private void prepareTextField(
-            JTextField field
-    ) {
+        String value =
+                severityField
+                        .getText()
+                        .trim();
+
+        try {
+
+            int severity =
+                    Integer.parseInt(
+                            value
+                    );
+
+            if (severity < 1
+                    || severity > 10) {
+
+                showError(
+                        "Şiddet değeri 1 ile 10 arasında olmalıdır."
+                );
+
+                return -1;
+            }
+
+            return severity;
+
+        } catch (
+                NumberFormatException e) {
+
+            showError(
+                    "Şiddet değeri sayısal olmalıdır."
+            );
+
+            return -1;
+        }
+    }
+
+    // ============================================================
+    // INTERNAL ID
+    // ============================================================
+
+    private String generatePatientId() {
+
+        int nextNumber =
+                patientRegistry
+                        .getPatientCount()
+                        + 1;
+
+        String id;
+
+        do {
+
+            id = String.format(
+                    "PAT-%04d",
+                    nextNumber
+            );
+
+            nextNumber++;
+
+        } while (
+                patientRegistry.contains(id)
+        );
+
+        return id;
+    }
+
+    // ============================================================
+    // CLEAR
+    // ============================================================
+
+    private void clearForm() {
+
+        nationalIdField.setText("");
+        nameField.setText("");
+        birthDateField.setText("");
+        phoneField.setText("");
+        emailField.setText("");
+        addressField.setText("");
+
+        severityField.setText("1");
+
+        genderBox.setSelectedIndex(0);
+        bloodGroupBox.setSelectedIndex(0);
+
+        patientTable.clearSelection();
+    }
+
+    private void clearSearch() {
+
+        searchField.setText("");
+    }
+
+    // ============================================================
+    // FORM FIELD
+    // ============================================================
+
+    private JPanel createFormField(
+            String labelText,
+            JComponent component) {
+
+        JPanel panel =
+                new JPanel();
+
+        panel.setLayout(
+                new BorderLayout(
+                        0,
+                        5
+                )
+        );
+
+        panel.setOpaque(false);
+
+        JLabel label =
+                new JLabel(labelText);
+
+        label.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+        label.setForeground(TEXT);
+
+        panel.add(
+                label,
+                BorderLayout.NORTH
+        );
+
+        panel.add(
+                component,
+                BorderLayout.CENTER
+        );
+
+        return panel;
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+
+    private JPanel createCardPanel() {
+
+        JPanel panel =
+                new JPanel();
+
+        panel.setBackground(
+                CARD_BACKGROUND
+        );
+
+        panel.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                BORDER
+                        ),
+                        new EmptyBorder(
+                                18,
+                                18,
+                                18,
+                                18
+                        )
+                )
+        );
+
+        return panel;
+    }
+
+    private JTextField createTextField() {
+
+        JTextField field =
+                new JTextField();
+
+        field.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        field.setPreferredSize(
+                new Dimension(
+                        0,
+                        36
+                )
+        );
 
         field.setMaximumSize(
                 new Dimension(
                         Integer.MAX_VALUE,
-                        35
+                        36
+                )
+        );
+
+        field.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                BORDER
+                        ),
+                        new EmptyBorder(
+                                5,
+                                10,
+                                5,
+                                10
+                        )
+                )
+        );
+
+        return field;
+    }
+
+    private JButton createButton(
+            String text,
+            Color color) {
+
+        JButton button =
+                new JButton(text);
+
+        button.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+        button.setForeground(
+                Color.WHITE
+        );
+
+        button.setBackground(
+                color
+        );
+
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+
+        button.setCursor(
+                new Cursor(
+                        Cursor.HAND_CURSOR
+                )
+        );
+
+        button.setPreferredSize(
+                new Dimension(
+                        120,
+                        38
+                )
+        );
+
+        button.setMaximumSize(
+                new Dimension(
+                        Integer.MAX_VALUE,
+                        38
+                )
+        );
+
+        return button;
+    }
+
+    private void styleComboBox(
+            JComboBox<String> comboBox) {
+
+        comboBox.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
+        );
+
+        comboBox.setPreferredSize(
+                new Dimension(
+                        0,
+                        36
+                )
+        );
+
+        comboBox.setMaximumSize(
+                new Dimension(
+                        Integer.MAX_VALUE,
+                        36
                 )
         );
     }
 
-    private EmptyBorder createCardBorder() {
+    // ============================================================
+    // COMBO HELPERS
+    // ============================================================
 
-        return new EmptyBorder(
-                20,
-                20,
-                20,
-                20
-        );
+    private String getSelectedValue(
+            JComboBox<String> comboBox) {
+
+        Object value =
+                comboBox.getSelectedItem();
+
+        if (value == null) {
+            return "";
+        }
+
+        String text =
+                value.toString();
+
+        if ("Seçiniz".equals(text)) {
+            return "";
+        }
+
+        return text;
     }
 
-    private void showMessage(
-            String message,
-            String title,
-            int type
-    ) {
+    private void selectComboValue(
+            JComboBox<String> comboBox,
+            String value) {
+
+        if (value == null
+                || value.trim().isEmpty()) {
+
+            comboBox.setSelectedIndex(0);
+
+            return;
+        }
+
+        comboBox.setSelectedItem(
+                value
+        );
+
+        if (comboBox.getSelectedIndex()
+                == -1) {
+
+            comboBox.setSelectedIndex(0);
+        }
+    }
+
+    // ============================================================
+    // DATA MASKING
+    // ============================================================
+
+    private String maskNationalId(
+            String nationalId) {
+
+        if (nationalId == null
+                || nationalId.length() != 11) {
+
+            return "***********";
+        }
+
+        return nationalId.charAt(0)
+                + "*********"
+                + nationalId.charAt(10);
+    }
+
+    private String maskName(
+            String name) {
+
+        if (name == null
+                || name.trim().isEmpty()) {
+
+            return "********";
+        }
+
+        String[] words =
+                name.trim()
+                        .split("\\s+");
+
+        StringBuilder result =
+                new StringBuilder();
+
+        for (int i = 0;
+             i < words.length;
+             i++) {
+
+            String word = words[i];
+
+            if (word.length() <= 2) {
+
+                result.append(word);
+
+            } else {
+
+                result.append(
+                        word.substring(
+                                0,
+                                2
+                        )
+                );
+
+                for (int j = 2;
+                     j < word.length();
+                     j++) {
+
+                    result.append("*");
+                }
+            }
+
+            if (i < words.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
+    }
+
+    private String maskPhone(
+            String phone) {
+
+        if (phone == null
+                || phone.trim().isEmpty()) {
+
+            return "-";
+        }
+
+        String cleanPhone =
+                phone.trim();
+
+        if (cleanPhone.length() <= 4) {
+            return "****";
+        }
+
+        int visibleStart = 2;
+        int visibleEnd = 2;
+
+        StringBuilder result =
+                new StringBuilder();
+
+        result.append(
+                cleanPhone.substring(
+                        0,
+                        visibleStart
+                )
+        );
+
+        int maskLength =
+                cleanPhone.length()
+                        - visibleStart
+                        - visibleEnd;
+
+        for (int i = 0;
+             i < maskLength;
+             i++) {
+
+            result.append("*");
+        }
+
+        result.append(
+                cleanPhone.substring(
+                        cleanPhone.length()
+                                - visibleEnd
+                )
+        );
+
+        return result.toString();
+    }
+
+    private String safeValue(
+            String value) {
+
+        if (value == null
+                || value.trim().isEmpty()) {
+
+            return "-";
+        }
+
+        return value;
+    }
+
+    // ============================================================
+    // MESSAGES
+    // ============================================================
+
+    private void showError(
+            String message) {
 
         JOptionPane.showMessageDialog(
                 this,
                 message,
-                title,
-                type
+                "Hata",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    private void showSuccess(
+            String message) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                message,
+                "Başarılı",
+                JOptionPane.INFORMATION_MESSAGE
         );
     }
 }

@@ -1,11 +1,19 @@
 package app;
 
-import ui.MainFrame;
+import ui.LoginFrame;
+
+import javax.swing.*;
 
 public class GUIStarter {
 
     public static void main(String[] args) {
 
-        new MainFrame();
+        SwingUtilities.invokeLater(() -> {
+
+            LoginFrame loginFrame =
+                    new LoginFrame();
+
+            loginFrame.setVisible(true);
+        });
     }
 }

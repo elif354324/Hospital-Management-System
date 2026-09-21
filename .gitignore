@@ -12,3 +12,6 @@
 
 # JAR files
 *.jar
+
+# Local AI test file
+TestAI.java

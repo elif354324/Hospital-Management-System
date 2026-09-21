@@ -13,6 +13,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class AppointmentPanel extends JPanel {
@@ -210,7 +213,7 @@ public class AppointmentPanel extends JPanel {
                 new JPanel(
                         new GridLayout(
                                 1,
-                                3,
+                                2,
                                 20,
                                 0
                         )
@@ -367,7 +370,7 @@ public class AppointmentPanel extends JPanel {
         // DATE
 
         card.add(
-                new JLabel("Appointment Date (YYYY-MM-DD)")
+                new JLabel("Appointment Date (DD.MM.YYYY)")
         );
 
         dateField =
@@ -406,7 +409,7 @@ public class AppointmentPanel extends JPanel {
                 new JButton("Clear");
 
         JButton updateButton =
-        new JButton("Update");
+                new JButton("Update");
 
 
         scheduleButton.addActionListener(
@@ -420,7 +423,6 @@ public class AppointmentPanel extends JPanel {
         updateButton.addActionListener(
                 e -> updateAppointment()
         );
-
 
         clearButton.addActionListener(
                 e -> clearFields()
@@ -621,67 +623,100 @@ public class AppointmentPanel extends JPanel {
         appointmentTable =
                 new JTable(tableModel);
 
-        appointmentTable.getSelectionModel().addListSelectionListener(
-        e -> {
 
-            if (e.getValueIsAdjusting()) {
-                return;
-            }
+        appointmentTable.getSelectionModel()
+                .addListSelectionListener(
+                        e -> {
 
-            int selectedRow =
-                    appointmentTable.getSelectedRow();
+                            if (e.getValueIsAdjusting()) {
+                                return;
+                            }
 
-            if (selectedRow == -1) {
-                return;
-            }
 
-            String patientId =
-                    tableModel.getValueAt(
-                            selectedRow,
-                            0
-                    ).toString();
+                            int selectedRow =
+                                    appointmentTable.getSelectedRow();
 
-            String patientName =
-                    tableModel.getValueAt(
-                            selectedRow,
-                            1
-                    ).toString();
 
-            String doctorName =
-                    tableModel.getValueAt(
-                            selectedRow,
-                            2
-                    ).toString();
+                            if (selectedRow == -1) {
+                                return;
+                            }
 
-            String time =
-                    tableModel.getValueAt(
-                            selectedRow,
-                            4
-                    ).toString();
 
-            String date =
-                    tableModel.getValueAt(
-                            selectedRow,
-                            5
-                    ).toString();
+                            String patientId =
+                                    tableModel.getValueAt(
+                                            selectedRow,
+                                            0
+                                    ).toString();
 
-            patientIdField.setText(patientId);
-            patientNameField.setText(patientName);
-            timeField.setText(time);
-            dateField.setText(date);
 
-            for (int i = 0; i < doctorBox.getItemCount(); i++) {
+                            String patientName =
+                                    tableModel.getValueAt(
+                                            selectedRow,
+                                            1
+                                    ).toString();
 
-                String doctorItem =
-                        doctorBox.getItemAt(i);
 
-                if (doctorItem.contains(doctorName)) {
-                    doctorBox.setSelectedIndex(i);
-                    break;
-                }
-            }
-        }
-);    
+                            String doctorName =
+                                    tableModel.getValueAt(
+                                            selectedRow,
+                                            2
+                                    ).toString();
+
+
+                            String time =
+                                    tableModel.getValueAt(
+                                            selectedRow,
+                                            4
+                                    ).toString();
+
+
+                            String date =
+                                    tableModel.getValueAt(
+                                            selectedRow,
+                                            5
+                                    ).toString();
+
+
+                            patientIdField.setText(
+                                    patientId
+                            );
+
+                            patientNameField.setText(
+                                    patientName
+                            );
+
+                            timeField.setText(
+                                    time
+                            );
+
+                            dateField.setText(
+                                    date
+                            );
+
+
+                            for (
+                                    int i = 0;
+                                    i < doctorBox.getItemCount();
+                                    i++
+                            ) {
+
+                                String doctorItem =
+                                        doctorBox.getItemAt(i);
+
+
+                                if (
+                                        doctorItem.contains(
+                                                doctorName
+                                        )
+                                ) {
+
+                                    doctorBox.setSelectedIndex(i);
+
+                                    break;
+                                }
+                            }
+                        }
+                );
 
 
         appointmentTable.setRowHeight(32);
@@ -750,122 +785,19 @@ public class AppointmentPanel extends JPanel {
         String time =
                 timeField.getText().trim();
 
-        String newDate =
+        String dateInput =
                 dateField.getText().trim();
 
-        if (newDate.isEmpty()) {
 
-    JOptionPane.showMessageDialog(
-            this,
-            "Please enter an appointment date.",
-            "Missing Date",
-            JOptionPane.WARNING_MESSAGE
-    );
-
-    return;
-}
-
-
-try {
-
-    java.time.LocalDate parsedDate =
-            java.time.LocalDate.parse(
-                    newDate,
-                    java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            );
-
-    newDate =
-            parsedDate.toString();
-
-} catch (java.time.format.DateTimeParseException e) {
-
-    JOptionPane.showMessageDialog(
-            this,
-            "Invalid date format.\nPlease use: gg.aa.yyyy\nExample: 03.09.2026",
-            "Invalid Date",
-            JOptionPane.ERROR_MESSAGE
-    );
-
-    return;
-}
-
-        try {
-
-    java.time.LocalDate parsedDate =
-            java.time.LocalDate.parse(
-                    newDate,
-                    java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            );
-
-    newDate =
-            parsedDate.toString();
-
-} catch (java.time.format.DateTimeParseException e) {
-
-    JOptionPane.showMessageDialog(
-            this,
-            "Invalid date format.\nPlease use: gg.aa.yyyy\nExample: 03.09.2026",
-            "Invalid Date",
-            JOptionPane.ERROR_MESSAGE
-    );
-
-    return;
-}
-
-        if (time.isEmpty()) {
-
-    JOptionPane.showMessageDialog(
-            this,
-            "Please enter an appointment time.",
-            "Missing Time",
-            JOptionPane.WARNING_MESSAGE
-    );
-
-    return;
-}
-
-
-if (newDate.isEmpty()) {
-
-    JOptionPane.showMessageDialog(
-            this,
-            "Please enter an appointment date.",
-            "Missing Date",
-            JOptionPane.WARNING_MESSAGE
-    );
-
-    return;
-}
-
-        try {
-
-    java.time.LocalDate parsedDate =
-            java.time.LocalDate.parse(
-                    newDate,
-                    java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
-            );
-
-    newDate =
-            parsedDate.toString();
-
-} catch (java.time.format.DateTimeParseException e) {
-
-    JOptionPane.showMessageDialog(
-            this,
-            "Please enter an appointment date.",
-            "Missing Date",
-            JOptionPane.ERROR_MESSAGE
-    );
-
-    return;
-}
-
+        // ================================
+        // BASIC VALIDATION
+        // ================================
 
         if (
                 patientId.isEmpty()
                         || patientName.isEmpty()
                         || time.isEmpty()
-                        || newDate.isEmpty()
+                        || dateInput.isEmpty()
         ) {
 
             showMessage(
@@ -878,10 +810,11 @@ if (newDate.isEmpty()) {
         }
 
 
-        if (
-                doctorBox.getSelectedItem()
-                        == null
-        ) {
+        // ================================
+        // DOCTOR VALIDATION
+        // ================================
+
+        if (doctorBox.getSelectedItem() == null) {
 
             showMessage(
                     "Please select a doctor.",
@@ -909,13 +842,57 @@ if (newDate.isEmpty()) {
         }
 
 
-        // Eğer hasta zaten varsa onu kullan
+        // ================================
+        // DATE VALIDATION
+        // USER FORMAT: DD.MM.YYYY
+        // ================================
+
+        String newDate;
+
+
+        try {
+
+            LocalDate parsedDate =
+                    LocalDate.parse(
+                            dateInput,
+                            DateTimeFormatter.ofPattern(
+                                    "dd.MM.uuuu"
+                            )
+                    );
+
+
+            // Internally stored as:
+            // 2026-09-04
+
+            newDate =
+                    parsedDate.toString();
+
+        } catch (DateTimeParseException e) {
+
+            showMessage(
+                    "Invalid date format.\n\n"
+                            + "Please use: DD.MM.YYYY\n"
+                            + "Example: 04.09.2026",
+
+                    "Invalid Date",
+
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+
+        // ================================
+        // PATIENT
+        // ================================
 
         Patient patient =
                 patientRegistry.get(patientId);
 
 
-        // Yoksa yeni hasta oluştur
+        // If patient does not exist,
+        // create a new patient.
 
         if (patient == null) {
 
@@ -925,12 +902,13 @@ if (newDate.isEmpty()) {
                             patientName
                     );
 
-
             patientRegistry.add(patient);
         }
 
 
-        // Aynı hastanın tekrar randevusu var mı?
+        // ================================
+        // DUPLICATE APPOINTMENT
+        // ================================
 
         if (
                 appointmentScheduler
@@ -947,23 +925,23 @@ if (newDate.isEmpty()) {
         }
 
 
+        // ================================
+        // CREATE APPOINTMENT
+        // ================================
+
         boolean success =
                 appointmentScheduler
                         .bookAppointmentWithTime(
-
                                 patient,
-
                                 selectedDoctor,
-
                                 time,
-
                                 newDate
                         );
 
 
         if (success) {
 
-            // Doktorun kendi FIFO kuyruğuna ekle
+            // Add patient to doctor's FIFO queue
 
             selectedDoctor.addPatientToQueue(
                     patient
@@ -983,9 +961,7 @@ if (newDate.isEmpty()) {
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-        }
-
-        else {
+        } else {
 
             showMessage(
                     "Invalid time format.\n\n"
@@ -999,21 +975,28 @@ if (newDate.isEmpty()) {
         }
     }
 
-        private void cancelAppointment() {
+
+    // =====================================
+    // CANCEL APPOINTMENT
+    // =====================================
+
+    private void cancelAppointment() {
 
         int selectedRow =
                 appointmentTable.getSelectedRow();
 
+
         if (selectedRow == -1) {
 
-                showMessage(
-                        "Please select an appointment from the table first.",
-                        "Cancel Appointment",
-                        JOptionPane.WARNING_MESSAGE
-                );
+            showMessage(
+                    "Please select an appointment from the table first.",
+                    "Cancel Appointment",
+                    JOptionPane.WARNING_MESSAGE
+            );
 
-                return;
+            return;
         }
+
 
         String patientId =
                 tableModel.getValueAt(
@@ -1021,11 +1004,13 @@ if (newDate.isEmpty()) {
                         0
                 ).toString();
 
+
         String patientName =
                 tableModel.getValueAt(
                         selectedRow,
                         1
                 ).toString();
+
 
         int confirmation =
                 JOptionPane.showConfirmDialog(
@@ -1044,148 +1029,278 @@ if (newDate.isEmpty()) {
                         JOptionPane.WARNING_MESSAGE
                 );
 
-        if (confirmation != JOptionPane.YES_OPTION) {
-                return;
+
+        if (
+                confirmation
+                        != JOptionPane.YES_OPTION
+        ) {
+
+            return;
         }
+
 
         boolean removed =
                 appointmentScheduler
-                        .cancelAppointment(patientId);
+                        .cancelAppointment(
+                                patientId
+                        );
+
 
         if (removed) {
 
-                refreshTable();
+            refreshTable();
 
-                refreshQueueInformation();
+            refreshQueueInformation();
 
-                clearFields();
+            clearFields();
 
-                showMessage(
-                        "Appointment cancelled successfully.",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+
+            showMessage(
+                    "Appointment cancelled successfully.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
 
         } else {
 
-                showMessage(
-                        "Appointment could not be cancelled.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+            showMessage(
+                    "Appointment could not be cancelled.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
-        }
-
-        private void updateAppointment() {
-
-    int selectedRow =
-            appointmentTable.getSelectedRow();
-
-    if (selectedRow == -1) {
-        showMessage(
-                "Please select an appointment from the table first.",
-                "Update Appointment",
-                JOptionPane.WARNING_MESSAGE
-        );
-        return;
     }
 
-    String patientId =
-            tableModel.getValueAt(
-                    selectedRow,
-                    0
-            ).toString();
 
-    String patientName =
-            tableModel.getValueAt(
-                    selectedRow,
-                    1
-            ).toString();
+    // =====================================
+    // UPDATE APPOINTMENT
+    // =====================================
+
+    private void updateAppointment() {
+
+        int selectedRow =
+                appointmentTable.getSelectedRow();
+
+
+        if (selectedRow == -1) {
+
+            showMessage(
+                    "Please select an appointment from the table first.",
+                    "Update Appointment",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+
+        String patientId =
+                tableModel.getValueAt(
+                        selectedRow,
+                        0
+                ).toString();
+
+
+        String patientName =
+                tableModel.getValueAt(
+                        selectedRow,
+                        1
+                ).toString();
+
+
+        // ================================
+        // DOCTOR
+        // ================================
 
         String selectedDoctorText =
                 (String) doctorBox.getSelectedItem();
 
-        if (selectedDoctorText == null || selectedDoctorText.trim().isEmpty()) {
-        showMessage(
-                "Please select a doctor.",
-                "Update Appointment",
-                JOptionPane.WARNING_MESSAGE
-        );
-        return;
+
+        if (
+                selectedDoctorText == null
+                        || selectedDoctorText.trim().isEmpty()
+        ) {
+
+            showMessage(
+                    "Please select a doctor.",
+                    "Update Appointment",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
         }
 
+
         String selectedDoctorId =
-                selectedDoctorText.split("\\|")[0].trim();
+                selectedDoctorText
+                        .split("\\|")[0]
+                        .trim();
+
 
         Doctor selectedDoctor =
-                HospitalData.getDoctorRegistry().get(selectedDoctorId);
+                doctorRegistry.get(
+                        selectedDoctorId
+                );
 
-    String time =
-            timeField.getText().trim();
 
-    String date =
-            dateField.getText().trim();
+        if (selectedDoctor == null) {
 
-    if (time.isEmpty() || date.isEmpty()) {
-        showMessage(
-                "Please enter appointment time and date.",
-                "Update Appointment",
-                JOptionPane.WARNING_MESSAGE
-        );
-        return;
-    }
-
-    int confirmation =
-            JOptionPane.showConfirmDialog(
-                    this,
-                    "Are you sure you want to update this appointment?\n\n"
-                            + "Patient: "
-                            + patientName
-                            + "\nDoctor: "
-                            + selectedDoctor.getName()
-                            + "\nTime: "
-                            + time
-                            + "\nDate: "
-                            + date,
-                    "Confirm Update",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
+            showMessage(
+                    "Selected doctor could not be found.",
+                    "Update Appointment",
+                    JOptionPane.ERROR_MESSAGE
             );
 
-    if (confirmation != JOptionPane.YES_OPTION) {
-        return;
-    }
+            return;
+        }
 
-    boolean updated =
-            appointmentScheduler.updateAppointment(
-                    patientId,
-                    selectedDoctor,
-                    time,
-                    date
+
+        // ================================
+        // TIME
+        // ================================
+
+        String time =
+                timeField.getText().trim();
+
+
+        // ================================
+        // DATE
+        // ================================
+
+        String dateInput =
+                dateField.getText().trim();
+
+
+        if (
+                time.isEmpty()
+                        || dateInput.isEmpty()
+        ) {
+
+            showMessage(
+                    "Please enter appointment time and date.",
+                    "Update Appointment",
+                    JOptionPane.WARNING_MESSAGE
             );
 
-    if (updated) {
+            return;
+        }
 
-        refreshTable();
-        refreshQueueInformation();
-        clearFields();
 
-        showMessage(
-                "Appointment updated successfully.",
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        // ================================
+        // DATE VALIDATION
+        // ================================
 
-    } else {
+        String date;
 
-        showMessage(
-                "Appointment could not be updated.\n"
-                        + "Please check the time format (HH:mm).",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
+
+        try {
+
+            LocalDate parsedDate =
+                    LocalDate.parse(
+                            dateInput,
+                            DateTimeFormatter.ofPattern(
+                                    "dd.MM.uuuu"
+                            )
+                    );
+
+
+            date =
+                    parsedDate.toString();
+
+        } catch (DateTimeParseException e) {
+
+            showMessage(
+                    "Invalid date format.\n\n"
+                            + "Please use: DD.MM.YYYY\n"
+                            + "Example: 04.09.2026",
+
+                    "Invalid Date",
+
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+
+        // ================================
+        // CONFIRMATION
+        // ================================
+
+        int confirmation =
+                JOptionPane.showConfirmDialog(
+                        this,
+
+                        "Are you sure you want to update this appointment?\n\n"
+                                + "Patient: "
+                                + patientName
+                                + "\nDoctor: "
+                                + selectedDoctor.getName()
+                                + "\nTime: "
+                                + time
+                                + "\nDate: "
+                                + dateInput,
+
+                        "Confirm Update",
+
+                        JOptionPane.YES_NO_OPTION,
+
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+
+        if (
+                confirmation
+                        != JOptionPane.YES_OPTION
+        ) {
+
+            return;
+        }
+
+
+        // ================================
+        // UPDATE
+        // ================================
+
+        boolean updated =
+                appointmentScheduler
+                        .updateAppointment(
+                                patientId,
+                                selectedDoctor,
+                                time,
+                                date
+                        );
+
+
+        if (updated) {
+
+            refreshTable();
+
+            refreshQueueInformation();
+
+            clearFields();
+
+
+            showMessage(
+                    "Appointment updated successfully.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } else {
+
+            showMessage(
+                    "Appointment could not be updated.\n\n"
+                            + "Please check:\n"
+                            + "- Time format: HH:mm\n"
+                            + "- Date format: DD.MM.YYYY",
+
+                    "Update Error",
+
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
-}
 
 
     // =====================================
@@ -1195,7 +1310,8 @@ if (newDate.isEmpty()) {
     private void callNextPatient() {
 
         Patient nextPatient =
-                appointmentScheduler.callNextPatient();
+                appointmentScheduler
+                        .callNextPatient();
 
 
         if (nextPatient == null) {
@@ -1248,7 +1364,9 @@ if (newDate.isEmpty()) {
 
 
         String doctorId =
-                selected.split("\\|")[0].trim();
+                selected
+                        .split("\\|")[0]
+                        .trim();
 
 
         return doctorRegistry.get(
@@ -1279,6 +1397,7 @@ if (newDate.isEmpty()) {
             Patient patient =
                     appointment.getPatient();
 
+
             Doctor doctor =
                     appointment.getDoctor();
 
@@ -1298,8 +1417,8 @@ if (newDate.isEmpty()) {
                             appointment.getTime(),
 
                             formatDateForDisplay(
-        appointment.getDate()
-            )
+                                    appointment.getDate()
+                            )
                     }
             );
         }
@@ -1313,7 +1432,8 @@ if (newDate.isEmpty()) {
     private void refreshQueueInformation() {
 
         int queueSize =
-                appointmentScheduler.getQueueSize();
+                appointmentScheduler
+                        .getQueueSize();
 
 
         queueLabel.setText(
@@ -1333,9 +1453,7 @@ if (newDate.isEmpty()) {
                     "Next Patient: None"
             );
 
-        }
-
-        else {
+        } else {
 
             nextPatientLabel.setText(
                     "Next Patient: "
@@ -1429,25 +1547,40 @@ if (newDate.isEmpty()) {
         );
     }
 
-    private String formatDateForDisplay(String date) {
 
-    if (date == null || date.trim().isEmpty()) {
-        return "";
-    }
+    // =====================================
+    // DATE DISPLAY FORMAT
+    // =====================================
 
-    try {
+    private String formatDateForDisplay(
+            String date
+    ) {
 
-        java.time.LocalDate parsedDate =
-                java.time.LocalDate.parse(date);
+        if (
+                date == null
+                        || date.trim().isEmpty()
+        ) {
 
-        return parsedDate.format(
-                java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        );
+            return "";
+        }
 
-    } catch (java.time.format.DateTimeParseException e) {
 
-        return date;
+        try {
+
+            LocalDate parsedDate =
+                    LocalDate.parse(date);
+
+
+            return parsedDate.format(
+                    DateTimeFormatter.ofPattern(
+                            "dd.MM.yyyy"
+                    )
+            );
+
+        } catch (DateTimeParseException e) {
+
+            return date;
+        }
     }
 }
 
-}

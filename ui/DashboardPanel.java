@@ -47,22 +47,270 @@ public class DashboardPanel extends JPanel {
     private final HashTable<Doctor> doctorRegistry;
     private final AppointmentScheduler appointmentScheduler;
 
+
     public DashboardPanel() {
 
-        patientRegistry = HospitalData.getPatientRegistry();
-        doctorRegistry = HospitalData.getDoctorRegistry();
-        appointmentScheduler = HospitalData.getAppointmentScheduler();
+        patientRegistry =
+                HospitalData.getPatientRegistry();
+
+        doctorRegistry =
+                HospitalData.getDoctorRegistry();
+
+        appointmentScheduler =
+                HospitalData.getAppointmentScheduler();
+
 
         setLayout(new BorderLayout());
+
         setBackground(BACKGROUND);
+
 
         createDashboard();
     }
 
- private JPanel createStatsPanel() {
 
-    JPanel panel =
-            new JPanel(
+    // =====================================
+    // STATS PANEL
+    // =====================================
+
+    private JPanel createStatsPanel() {
+
+        JPanel panel =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                4,
+                                18,
+                                18
+                        )
+                );
+
+        panel.setBackground(BACKGROUND);
+
+        panel.setAlignmentX(
+                Component.LEFT_ALIGNMENT
+        );
+
+
+        patientCard =
+                createStatCardPanel(
+                        "PATIENTS",
+                        PRIMARY,
+                        0
+                );
+
+
+        doctorCard =
+                createStatCardPanel(
+                        "DOCTORS",
+                        GREEN,
+                        1
+                );
+
+
+        appointmentCard =
+                createStatCardPanel(
+                        "APPOINTMENTS",
+                        ORANGE,
+                        2
+                );
+
+
+        waitingCard =
+                createStatCardPanel(
+                        "WAITING",
+                        RED,
+                        3
+                );
+
+
+        panel.add(patientCard);
+
+        panel.add(doctorCard);
+
+        panel.add(appointmentCard);
+
+        panel.add(waitingCard);
+
+
+        return panel;
+    }
+
+
+    // =====================================
+    // STAT CARD
+    // =====================================
+
+    private JPanel createStatCardPanel(
+            String title,
+            Color accent,
+            int type
+    ) {
+
+        JPanel card =
+                new JPanel(
+                        new BorderLayout()
+                );
+
+        card.setBackground(CARD);
+
+        card.setBorder(
+                BorderFactory.createCompoundBorder(
+
+                        BorderFactory.createLineBorder(
+                                new Color(
+                                        225,
+                                        229,
+                                        235
+                                )
+                        ),
+
+                        new EmptyBorder(
+                                18,
+                                20,
+                                18,
+                                20
+                        )
+                )
+        );
+
+
+        JLabel titleLabel =
+                new JLabel(title);
+
+        titleLabel.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+        titleLabel.setForeground(SECONDARY);
+
+
+        JLabel valueLabel =
+                new JLabel("0");
+
+        valueLabel.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        32
+                )
+        );
+
+        valueLabel.setForeground(accent);
+
+
+        card.add(
+                titleLabel,
+                BorderLayout.NORTH
+        );
+
+        card.add(
+                valueLabel,
+                BorderLayout.CENTER
+        );
+
+
+        // Label referanslarını kaydet
+
+        if (type == 0) {
+
+            patientCountLabel =
+                    valueLabel;
+
+        } else if (type == 1) {
+
+            doctorCountLabel =
+                    valueLabel;
+
+        } else if (type == 2) {
+
+            appointmentCountLabel =
+                    valueLabel;
+
+        } else if (type == 3) {
+
+            waitingCountLabel =
+                    valueLabel;
+        }
+
+
+        return card;
+    }
+
+
+    // =====================================
+    // LOWER PANEL
+    // =====================================
+
+    private JPanel createLowerPanel() {
+
+        JPanel panel =
+                new JPanel(
+                        new GridLayout(
+                                1,
+                                2,
+                                20,
+                                0
+                        )
+                );
+
+        panel.setBackground(BACKGROUND);
+
+        panel.setAlignmentX(
+                Component.LEFT_ALIGNMENT
+        );
+
+
+        appointmentsPanel =
+                createAppointmentsPanel();
+
+
+        overviewPanel =
+                createOverviewPanel();
+
+
+        panel.add(appointmentsPanel);
+
+        panel.add(overviewPanel);
+
+
+        return panel;
+    }
+
+
+    // =====================================
+    // RESPONSIVE LAYOUT
+    // =====================================
+
+    private void updateResponsiveLayout() {
+
+        if (
+                statsPanel == null
+                        || lowerPanel == null
+        ) {
+
+            return;
+        }
+
+
+        int width =
+                getWidth();
+
+
+        // =========================================
+        // STAT CARDS
+        // =========================================
+
+        statsPanel.removeAll();
+
+
+        if (width >= 1100) {
+
+            statsPanel.setLayout(
                     new GridLayout(
                             1,
                             4,
@@ -71,156 +319,67 @@ public class DashboardPanel extends JPanel {
                     )
             );
 
-    panel.setBackground(BACKGROUND);
 
-    panel.setAlignmentX(
-            Component.LEFT_ALIGNMENT
-    );
-
-
-    patientCard =
-            createStatCardPanel(
-                    "PATIENTS",
-                    PRIMARY,
-                    0
-            );
-
-
-    doctorCard =
-            createStatCardPanel(
-                    "DOCTORS",
-                    GREEN,
-                    1
-            );
-
-
-    appointmentCard =
-            createStatCardPanel(
-                    "APPOINTMENTS",
-                    ORANGE,
-                    2
-            );
-
-
-    waitingCard =
-            createStatCardPanel(
-                    "WAITING",
-                    RED,
-                    3
-            );
-
-
-    panel.add(patientCard);
-
-    panel.add(doctorCard);
-
-    panel.add(appointmentCard);
-
-    panel.add(waitingCard);
-
-
-    return panel;
-}
-
-private JPanel createStatCardPanel(
-        String title,
-        Color accent,
-        int type
-) {
-
-    JPanel card =
-            new JPanel(
-                    new BorderLayout()
-            );
-
-    card.setBackground(CARD);
-
-    card.setBorder(
-            BorderFactory.createCompoundBorder(
-
-                    BorderFactory.createLineBorder(
-                            new Color(
-                                    225,
-                                    229,
-                                    235
-                            )
-                    ),
-
-                    new EmptyBorder(
-                            18,
-                            20,
-                            18,
-                            20
+            statsPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            130
                     )
-            )
-    );
+            );
+
+        } else if (width >= 750) {
+
+            statsPanel.setLayout(
+                    new GridLayout(
+                            2,
+                            2,
+                            18,
+                            18
+                    )
+            );
 
 
-    JLabel titleLabel =
-            new JLabel(title);
+            statsPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            270
+                    )
+            );
 
-    titleLabel.setFont(
-            new Font(
-                    "Segoe UI",
-                    Font.BOLD,
-                    12
-            )
-    );
+        } else {
 
-    titleLabel.setForeground(SECONDARY);
-
-
-    JLabel valueLabel =
-            new JLabel("0");
-
-    valueLabel.setFont(
-            new Font(
-                    "Segoe UI",
-                    Font.BOLD,
-                    32
-            )
-    );
-
-    valueLabel.setForeground(accent);
+            statsPanel.setLayout(
+                    new GridLayout(
+                            4,
+                            1,
+                            0,
+                            15
+                    )
+            );
 
 
-    card.add(
-            titleLabel,
-            BorderLayout.NORTH
-    );
-
-    card.add(
-            valueLabel,
-            BorderLayout.CENTER
-    );
+            statsPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            520
+                    )
+            );
+        }
 
 
-    // Label referanslarını kaydet
-
-    if (type == 0) {
-        patientCountLabel = valueLabel;
-    }
-
-    else if (type == 1) {
-        doctorCountLabel = valueLabel;
-    }
-
-    else if (type == 2) {
-        appointmentCountLabel = valueLabel;
-    }
-
-    else if (type == 3) {
-        waitingCountLabel = valueLabel;
-    }
+        addStatCards();
 
 
-    return card;
-}
+        // =========================================
+        // LOWER PANELS
+        // =========================================
 
-private JPanel createLowerPanel() {
+        lowerPanel.removeAll();
 
-    JPanel panel =
-            new JPanel(
+
+        if (width >= 900) {
+
+            lowerPanel.setLayout(
                     new GridLayout(
                             1,
                             2,
@@ -229,629 +388,750 @@ private JPanel createLowerPanel() {
                     )
             );
 
-    panel.setBackground(BACKGROUND);
 
-    panel.setAlignmentX(
-            Component.LEFT_ALIGNMENT
-    );
-
-
-    appointmentsPanel =
-            createAppointmentsPanel();
+            lowerPanel.add(
+                    appointmentsPanel
+            );
 
 
-    overviewPanel =
-            createOverviewPanel();
+            lowerPanel.add(
+                    overviewPanel
+            );
 
 
-    panel.add(appointmentsPanel);
+            lowerPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            400
+                    )
+            );
 
-    panel.add(overviewPanel);
+        } else {
+
+            lowerPanel.setLayout(
+                    new BoxLayout(
+                            lowerPanel,
+                            BoxLayout.Y_AXIS
+                    )
+            );
 
 
-    return panel;
-}
+            appointmentsPanel.setAlignmentX(
+                    Component.LEFT_ALIGNMENT
+            );
 
-private void updateResponsiveLayout() {
 
-    if (
-            statsPanel == null
-                    || lowerPanel == null
-    ) {
-        return;
+            overviewPanel.setAlignmentX(
+                    Component.LEFT_ALIGNMENT
+            );
+
+
+            appointmentsPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            350
+                    )
+            );
+
+
+            overviewPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            500
+                    )
+            );
+
+
+            lowerPanel.add(
+                    appointmentsPanel
+            );
+
+
+            lowerPanel.add(
+                    Box.createVerticalStrut(20)
+            );
+
+
+            lowerPanel.add(
+                    overviewPanel
+            );
+
+
+            lowerPanel.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            900
+                    )
+            );
+        }
+
+
+        statsPanel.revalidate();
+        statsPanel.repaint();
+
+
+        lowerPanel.revalidate();
+        lowerPanel.repaint();
+
+
+        content.revalidate();
+        content.repaint();
     }
 
 
-    int width =
-            getWidth();
+    // =====================================
+    // ADD STAT CARDS
+    // =====================================
 
+    private void addStatCards() {
 
-    // =========================================
-    // STAT CARDS
-    // =========================================
+        statsPanel.add(patientCard);
 
-    statsPanel.removeAll();
+        statsPanel.add(doctorCard);
 
+        statsPanel.add(appointmentCard);
 
-    if (width >= 1100) {
-
-        statsPanel.setLayout(
-                new GridLayout(
-                        1,
-                        4,
-                        18,
-                        18
-                )
-        );
-
-
-        statsPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        130
-                )
-        );
-
-    }
-
-    else if (width >= 750) {
-
-        statsPanel.setLayout(
-                new GridLayout(
-                        2,
-                        2,
-                        18,
-                        18
-                )
-        );
-
-
-        statsPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        270
-                )
-        );
-
-    }
-
-    else {
-
-        statsPanel.setLayout(
-                new GridLayout(
-                        4,
-                        1,
-                        0,
-                        15
-                )
-        );
-
-
-        statsPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        520
-                )
-        );
+        statsPanel.add(waitingCard);
     }
 
 
-    addStatCards();
+    // =====================================
+    // CREATE DASHBOARD
+    // =====================================
+
+    private void createDashboard() {
+
+        content =
+                new JPanel();
 
 
-    // =========================================
-    // LOWER PANELS
-    // =========================================
-
-    lowerPanel.removeAll();
-
-
-    if (width >= 900) {
-
-        // Büyük ekran:
-        // Appointment | System Overview
-
-        lowerPanel.setLayout(
-                new GridLayout(
-                        1,
-                        2,
-                        20,
-                        0
-                )
-        );
-
-
-        lowerPanel.add(
-                appointmentsPanel
-        );
-
-
-        lowerPanel.add(
-                overviewPanel
-        );
-
-
-        lowerPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        400
-                )
-        );
-
-    }
-
-    else {
-
-        // Küçük ekran:
-        // Appointment
-        //
-        // System Overview
-
-        lowerPanel.setLayout(
+        content.setLayout(
                 new BoxLayout(
-                        lowerPanel,
+                        content,
                         BoxLayout.Y_AXIS
                 )
         );
 
 
-        appointmentsPanel.setAlignmentX(
+        content.setBackground(
+                BACKGROUND
+        );
+
+
+        content.setBorder(
+                new EmptyBorder(
+                        30,
+                        35,
+                        30,
+                        35
+                )
+        );
+
+
+        // =========================
+        // HEADER
+        // =========================
+
+        JLabel title =
+                new JLabel(
+                        "Hospital Management System"
+                );
+
+
+        title.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        28
+                )
+        );
+
+
+        title.setForeground(TEXT);
+
+        title.setAlignmentX(
                 Component.LEFT_ALIGNMENT
         );
 
 
-        overviewPanel.setAlignmentX(
+        JLabel subtitle =
+                new JLabel(
+                        "Welcome to the hospital administration dashboard"
+                );
+
+
+        subtitle.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        14
+                )
+        );
+
+
+        subtitle.setForeground(
+                SECONDARY
+        );
+
+
+        subtitle.setAlignmentX(
                 Component.LEFT_ALIGNMENT
         );
 
 
-        appointmentsPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        350
-                )
+        content.add(title);
+
+
+        content.add(
+                Box.createVerticalStrut(5)
         );
 
 
-        overviewPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        500
-                )
+        content.add(subtitle);
+
+
+        content.add(
+                Box.createVerticalStrut(25)
         );
 
 
-        lowerPanel.add(
-                appointmentsPanel
+        // =========================
+        // STATISTICS
+        // =========================
+
+        statsPanel =
+                createStatsPanel();
+
+
+        content.add(statsPanel);
+
+
+        content.add(
+                Box.createVerticalStrut(25)
         );
 
 
-        lowerPanel.add(
-                Box.createVerticalStrut(20)
+        // =========================
+        // LOWER CONTENT
+        // =========================
+
+        lowerPanel =
+                createLowerPanel();
+
+
+        content.add(lowerPanel);
+
+
+        // =========================
+        // SCROLL
+        // =========================
+
+        scrollPane =
+                new JScrollPane(
+                        content
+                );
+
+
+        scrollPane.setBorder(null);
+
+
+        scrollPane
+                .getVerticalScrollBar()
+                .setUnitIncrement(16);
+
+
+        add(
+                scrollPane,
+                BorderLayout.CENTER
         );
 
 
-        lowerPanel.add(
-                overviewPanel
+        // =========================
+        // RESPONSIVE
+        // =========================
+
+        addComponentListener(
+                new java.awt.event.ComponentAdapter() {
+
+                    @Override
+                    public void componentResized(
+                            java.awt.event.ComponentEvent e
+                    ) {
+
+                        updateResponsiveLayout();
+                    }
+
+
+                    @Override
+                    public void componentShown(
+                            java.awt.event.ComponentEvent e
+                    ) {
+
+                        refresh();
+                    }
+                }
         );
 
 
-        lowerPanel.setMaximumSize(
-                new Dimension(
-                        Integer.MAX_VALUE,
-                        900
-                )
+        SwingUtilities.invokeLater(
+                this::updateResponsiveLayout
         );
+
+
+        refresh();
     }
 
 
-    statsPanel.revalidate();
-    statsPanel.repaint();
-
-
-    lowerPanel.revalidate();
-    lowerPanel.repaint();
-
-
-    content.revalidate();
-    content.repaint();
-}
-
-private void addStatCards() {
-
-    statsPanel.add(patientCard);
-
-    statsPanel.add(doctorCard);
-
-    statsPanel.add(appointmentCard);
-
-    statsPanel.add(waitingCard);
-}
-
-    private void createDashboard() {
-
-    content = new JPanel();
-    content.setLayout(
-            new BoxLayout(
-                    content,
-                    BoxLayout.Y_AXIS
-            )
-    );
-
-    content.setBackground(BACKGROUND);
-
-    content.setBorder(
-            new EmptyBorder(
-                    30,
-                    35,
-                    30,
-                    35
-            )
-    );
-
-
-    // =========================
-    // HEADER
-    // =========================
-
-    JLabel title =
-            new JLabel(
-                    "Hospital Management System"
-            );
-
-    title.setFont(
-            new Font(
-                    "Segoe UI",
-                    Font.BOLD,
-                    28
-            )
-    );
-
-    title.setForeground(TEXT);
-    title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-
-    JLabel subtitle =
-            new JLabel(
-                    "Welcome to the hospital administration dashboard"
-            );
-
-    subtitle.setFont(
-            new Font(
-                    "Segoe UI",
-                    Font.PLAIN,
-                    14
-            )
-    );
-
-    subtitle.setForeground(SECONDARY);
-    subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-    content.add(title);
-
-    content.add(
-            Box.createVerticalStrut(5)
-    );
-
-    content.add(subtitle);
-
-    content.add(
-            Box.createVerticalStrut(25)
-    );
-
-
-    // =========================
-    // STATISTICS
-    // =========================
-
-    statsPanel =
-            createStatsPanel();
-
-    content.add(statsPanel);
-
-    content.add(
-            Box.createVerticalStrut(25)
-    );
-
-
-    // =========================
-    // LOWER CONTENT
-    // =========================
-
-    lowerPanel =
-            createLowerPanel();
-
-    content.add(lowerPanel);
-
-
-    // =========================
-    // SCROLL
-    // =========================
-
-    scrollPane =
-            new JScrollPane(content);
-
-    scrollPane.setBorder(null);
-
-    scrollPane.getVerticalScrollBar()
-            .setUnitIncrement(16);
-
-
-    add(
-            scrollPane,
-            BorderLayout.CENTER
-    );
-
-
-    // Responsive kontrolü
-
-    addComponentListener(
-            new java.awt.event.ComponentAdapter() {
-
-                @Override
-                public void componentResized(
-                        java.awt.event.ComponentEvent e
-                ) {
-
-                    updateResponsiveLayout();
-                }
-            }
-    );
-
-
-    SwingUtilities.invokeLater(
-            this::updateResponsiveLayout
-    );
-
-
-    refresh();
-}
-
-    // =========================
-    // STAT CARD
-    // =========================
-
-   /*private JLabel createStatCard(
-            JPanel parent,
-            String title,
-            String value,
-            Color accent
-    ) {
-
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(CARD);
-        card.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(225, 229, 235)
-                        ),
-                        new EmptyBorder(18, 20, 18, 20)
-                )
-        );
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(
-                new Font("Segoe UI", Font.BOLD, 12)
-        );
-        titleLabel.setForeground(SECONDARY);
-
-        JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(
-                new Font("Segoe UI", Font.BOLD, 32)
-        );
-        valueLabel.setForeground(accent);
-
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(valueLabel, BorderLayout.CENTER);
-
-        parent.add(card);
-
-        return valueLabel;
-    }*/
-
-    // =========================
+    // =====================================
     // APPOINTMENTS
-    // =========================
+    // =====================================
 
     private JPanel createAppointmentsPanel() {
 
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel =
+                new JPanel(
+                        new BorderLayout()
+                );
+
+
         panel.setBackground(CARD);
+
 
         panel.setBorder(
                 BorderFactory.createCompoundBorder(
+
                         BorderFactory.createLineBorder(
-                                new Color(225, 229, 235)
+                                new Color(
+                                        225,
+                                        229,
+                                        235
+                                )
                         ),
-                        new EmptyBorder(20, 20, 20, 20)
+
+                        new EmptyBorder(
+                                20,
+                                20,
+                                20,
+                                20
+                        )
                 )
         );
 
-        JLabel title = new JLabel("Upcoming Appointments");
+
+        JLabel title =
+                new JLabel(
+                        "Upcoming Appointments"
+                );
+
+
         title.setFont(
-                new Font("Segoe UI", Font.BOLD, 18)
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        18
+                )
         );
+
+
         title.setForeground(TEXT);
 
-        panel.add(title, BorderLayout.NORTH);
 
-        JPanel listPanel = new JPanel();
-        listPanel.setLayout(
-                new BoxLayout(listPanel, BoxLayout.Y_AXIS)
+        panel.add(
+                title,
+                BorderLayout.NORTH
         );
+
+
+        JPanel listPanel =
+                new JPanel();
+
+
+        listPanel.setLayout(
+                new BoxLayout(
+                        listPanel,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+
         listPanel.setBackground(CARD);
 
+
         List<Appointment> appointments =
-                appointmentScheduler.getAllAppointments();
+                appointmentScheduler
+                        .getAllAppointments();
+
 
         if (appointments.isEmpty()) {
 
             JLabel emptyLabel =
-                    new JLabel("No appointments scheduled.");
+                    new JLabel(
+                            "No appointments scheduled."
+                    );
+
 
             emptyLabel.setFont(
-                    new Font("Segoe UI", Font.PLAIN, 14)
+                    new Font(
+                            "Segoe UI",
+                            Font.PLAIN,
+                            14
+                    )
             );
-            emptyLabel.setForeground(SECONDARY);
 
-            listPanel.add(Box.createVerticalStrut(20));
-            listPanel.add(emptyLabel);
+
+            emptyLabel.setForeground(
+                    SECONDARY
+            );
+
+
+            listPanel.add(
+                    Box.createVerticalStrut(20)
+            );
+
+
+            listPanel.add(
+                    emptyLabel
+            );
 
         } else {
 
             int count = 0;
 
-            for (Appointment appointment : appointments) {
+
+            for (
+                    Appointment appointment :
+                    appointments
+            ) {
 
                 if (count >= 6) {
                     break;
                 }
 
-                JPanel appointmentCard =
-                        createAppointmentRow(appointment);
 
-                listPanel.add(appointmentCard);
-                listPanel.add(Box.createVerticalStrut(8));
+                JPanel appointmentCard =
+                        createAppointmentRow(
+                                appointment
+                        );
+
+
+                listPanel.add(
+                        appointmentCard
+                );
+
+
+                listPanel.add(
+                        Box.createVerticalStrut(8)
+                );
+
 
                 count++;
             }
         }
 
+
         JScrollPane scroll =
-                new JScrollPane(listPanel);
+                new JScrollPane(
+                        listPanel
+                );
+
 
         scroll.setBorder(null);
-        scroll.getVerticalScrollBar().setUnitIncrement(12);
 
-        panel.add(scroll, BorderLayout.CENTER);
+
+        scroll.getVerticalScrollBar()
+                .setUnitIncrement(12);
+
+
+        panel.add(
+                scroll,
+                BorderLayout.CENTER
+        );
+
 
         return panel;
     }
+
 
     private JPanel createAppointmentRow(
             Appointment appointment
     ) {
 
-        JPanel row = new JPanel(new BorderLayout());
-        row.setBackground(new Color(249, 250, 251));
+        JPanel row =
+                new JPanel(
+                        new BorderLayout()
+                );
+
+
+        row.setBackground(
+                new Color(
+                        249,
+                        250,
+                        251
+                )
+        );
+
 
         row.setBorder(
-                new EmptyBorder(10, 12, 10, 12)
+                new EmptyBorder(
+                        10,
+                        12,
+                        10,
+                        12
+                )
         );
 
-        Patient patient = appointment.getPatient();
-        Doctor doctor = appointment.getDoctor();
+
+        Patient patient =
+                appointment.getPatient();
+
+
+        Doctor doctor =
+                appointment.getDoctor();
+
 
         JLabel patientLabel =
-                new JLabel(patient.getName());
+                new JLabel(
+                        patient.getName()
+                );
+
 
         patientLabel.setFont(
-                new Font("Segoe UI", Font.BOLD, 14)
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        14
+                )
         );
+
+
         patientLabel.setForeground(TEXT);
 
+
         JLabel doctorLabel =
-                new JLabel("Dr. " + doctor.getName());
+                new JLabel(
+                        "Dr. "
+                                + doctor.getName()
+                );
+
 
         doctorLabel.setFont(
-                new Font("Segoe UI", Font.PLAIN, 12)
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        12
+                )
         );
-        doctorLabel.setForeground(SECONDARY);
 
-        JPanel info = new JPanel();
-        info.setLayout(
-                new BoxLayout(info, BoxLayout.Y_AXIS)
+
+        doctorLabel.setForeground(
+                SECONDARY
         );
-        info.setBackground(row.getBackground());
+
+
+        JPanel info =
+                new JPanel();
+
+
+        info.setLayout(
+                new BoxLayout(
+                        info,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+
+        info.setBackground(
+                row.getBackground()
+        );
+
 
         info.add(patientLabel);
-        info.add(Box.createVerticalStrut(3));
+
+
+        info.add(
+                Box.createVerticalStrut(3)
+        );
+
+
         info.add(doctorLabel);
+
 
         JLabel timeLabel =
                 new JLabel(
-                        appointment.getDate()
+                        formatDateForDisplay(
+                                appointment.getDate()
+                        )
                                 + "  "
                                 + appointment.getTime()
                 );
 
-        timeLabel.setFont(
-                new Font("Segoe UI", Font.BOLD, 12)
-        );
-        timeLabel.setForeground(PRIMARY);
 
-        row.add(info, BorderLayout.CENTER);
-        row.add(timeLabel, BorderLayout.EAST);
+        timeLabel.setFont(
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        12
+                )
+        );
+
+
+        timeLabel.setForeground(
+                PRIMARY
+        );
+
+
+        row.add(
+                info,
+                BorderLayout.CENTER
+        );
+
+
+        row.add(
+                timeLabel,
+                BorderLayout.EAST
+        );
+
 
         return row;
     }
 
-    // =========================
+
+    // =====================================
     // SYSTEM OVERVIEW
-    // =========================
+    // =====================================
 
     private JPanel createOverviewPanel() {
 
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel =
+                new JPanel(
+                        new BorderLayout()
+                );
+
+
         panel.setBackground(CARD);
+
 
         panel.setBorder(
                 BorderFactory.createCompoundBorder(
+
                         BorderFactory.createLineBorder(
-                                new Color(225, 229, 235)
+                                new Color(
+                                        225,
+                                        229,
+                                        235
+                                )
                         ),
-                        new EmptyBorder(20, 20, 20, 20)
+
+                        new EmptyBorder(
+                                20,
+                                20,
+                                20,
+                                20
+                        )
                 )
         );
 
+
         JLabel title =
-                new JLabel("System Overview");
+                new JLabel(
+                        "System Overview"
+                );
+
 
         title.setFont(
-                new Font("Segoe UI", Font.BOLD, 18)
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        18
+                )
         );
+
+
         title.setForeground(TEXT);
 
-        panel.add(title, BorderLayout.NORTH);
 
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(
-                new BoxLayout(infoPanel, BoxLayout.Y_AXIS)
+        panel.add(
+                title,
+                BorderLayout.NORTH
         );
+
+
+        JPanel infoPanel =
+                new JPanel();
+
+
+        infoPanel.setLayout(
+                new BoxLayout(
+                        infoPanel,
+                        BoxLayout.Y_AXIS
+                )
+        );
+
+
         infoPanel.setBackground(CARD);
+
+
+        // =========================
+        // REGISTERED DEPARTMENTS
+        // =========================
 
         addOverviewItem(
                 infoPanel,
                 "Registered Departments",
                 String.valueOf(
-                        HospitalData.getDepartments().size()
+                        HospitalData
+                                .getDepartments()
+                                .size()
                 )
         );
+
+
+        // =========================
+        // PATIENT REGISTRY
+        // =========================
 
         addOverviewItem(
                 infoPanel,
                 "Patient Registry Capacity",
                 String.valueOf(
-                        patientRegistry.getCapacity()
+                        patientRegistry
+                                .getCapacity()
                 )
         );
+
+
+        // =========================
+        // LOAD FACTOR
+        // =========================
 
         addOverviewItem(
                 infoPanel,
                 "Registry Load Factor",
                 String.format(
                         "%.2f",
-                        patientRegistry.getLoadFactor()
+                        patientRegistry
+                                .getLoadFactor()
                 )
         );
+
+
+        // =========================
+        // WAITING QUEUE
+        // =========================
 
         addOverviewItem(
                 infoPanel,
                 "Waiting Queue",
                 String.valueOf(
-                        appointmentScheduler.getQueueSize()
+                        appointmentScheduler
+                                .getQueueSize()
                 )
         );
+
+
+        // =========================
+        // EMERGENCY
+        // =========================
 
         addOverviewItem(
                 infoPanel,
@@ -859,16 +1139,31 @@ private void addStatCards() {
                 "20 patients"
         );
 
+
+        // =========================
+        // SYSTEM DATE
+        // =========================
+
         addOverviewItem(
                 infoPanel,
                 "System Date",
                 LocalDate.now().toString()
         );
 
-        panel.add(infoPanel, BorderLayout.CENTER);
+
+        panel.add(
+                infoPanel,
+                BorderLayout.CENTER
+        );
+
 
         return panel;
     }
+
+
+    // =====================================
+    // OVERVIEW ITEM
+    // =====================================
 
     private void addOverviewItem(
             JPanel parent,
@@ -876,40 +1171,78 @@ private void addStatCards() {
             String value
     ) {
 
-        JPanel row = new JPanel(
-                new BorderLayout()
-        );
+        JPanel row =
+                new JPanel(
+                        new BorderLayout()
+                );
+
 
         row.setBackground(CARD);
+
+
         row.setBorder(
-                new EmptyBorder(10, 0, 10, 0)
+                new EmptyBorder(
+                        10,
+                        0,
+                        10,
+                        0
+                )
         );
+
 
         JLabel titleLabel =
                 new JLabel(title);
 
+
         titleLabel.setFont(
-                new Font("Segoe UI", Font.PLAIN, 13)
+                new Font(
+                        "Segoe UI",
+                        Font.PLAIN,
+                        13
+                )
         );
-        titleLabel.setForeground(SECONDARY);
+
+
+        titleLabel.setForeground(
+                SECONDARY
+        );
+
 
         JLabel valueLabel =
                 new JLabel(value);
 
+
         valueLabel.setFont(
-                new Font("Segoe UI", Font.BOLD, 13)
+                new Font(
+                        "Segoe UI",
+                        Font.BOLD,
+                        13
+                )
         );
+
+
         valueLabel.setForeground(TEXT);
 
-        row.add(titleLabel, BorderLayout.WEST);
-        row.add(valueLabel, BorderLayout.EAST);
+
+        row.add(
+                titleLabel,
+                BorderLayout.WEST
+        );
+
+
+        row.add(
+                valueLabel,
+                BorderLayout.EAST
+        );
+
 
         parent.add(row);
     }
 
-    // =========================
+
+    // =====================================
     // REFRESH
-    // =========================
+    // =====================================
 
     public void refresh() {
 
@@ -917,103 +1250,294 @@ private void addStatCards() {
             return;
         }
 
+
+        // =========================
+        // PATIENT COUNT
+        // =========================
+
         int patientCount =
-                patientRegistry.getPatientCount();
+                patientRegistry
+                        .getPatientCount();
+
+
+        // =========================
+        // DOCTOR COUNT
+        // =========================
 
         int doctorCount =
-                doctorRegistry.getAllValues().size();
+                doctorRegistry
+                        .getAllValues()
+                        .size();
+
+
+        // =========================
+        // APPOINTMENT COUNT
+        // =========================
 
         int appointmentCount =
                 appointmentScheduler
                         .getScheduledAppointmentsCount();
 
+
+        // =========================
+        // WAITING QUEUE
+        // =========================
+
         int waitingCount =
-                appointmentScheduler.getQueueSize();
+                appointmentScheduler
+                        .getQueueSize();
+
+
+        // =========================
+        // UPDATE STAT CARDS
+        // =========================
 
         patientCountLabel.setText(
-                String.valueOf(patientCount)
+                String.valueOf(
+                        patientCount
+                )
         );
+
 
         doctorCountLabel.setText(
-                String.valueOf(doctorCount)
+                String.valueOf(
+                        doctorCount
+                )
         );
+
 
         appointmentCountLabel.setText(
-                String.valueOf(appointmentCount)
+                String.valueOf(
+                        appointmentCount
+                )
         );
+
 
         waitingCountLabel.setText(
-                String.valueOf(waitingCount)
+                String.valueOf(
+                        waitingCount
+                )
         );
 
+
+        // =========================
+        // REFRESH APPOINTMENTS
+        // =========================
+
         refreshAppointments();
+
+
+        // =========================
+        // REFRESH SYSTEM OVERVIEW
+        // =========================
+
+        refreshOverview();
+
+
+        revalidate();
+        repaint();
     }
+
+
+    // =====================================
+    // REFRESH APPOINTMENTS
+    // =====================================
 
     private void refreshAppointments() {
 
-    if (
-            appointmentsPanel == null
-                    || lowerPanel == null
+        if (
+                appointmentsPanel == null
+                        || lowerPanel == null
+        ) {
+
+            return;
+        }
+
+
+        JPanel newAppointmentsPanel =
+                createAppointmentsPanel();
+
+
+        Container parent =
+                appointmentsPanel.getParent();
+
+
+        if (parent == null) {
+            return;
+        }
+
+
+        int index = -1;
+
+
+        Component[] components =
+                parent.getComponents();
+
+
+        for (
+                int i = 0;
+                i < components.length;
+                i++
+        ) {
+
+            if (
+                    components[i]
+                            == appointmentsPanel
+            ) {
+
+                index = i;
+
+                break;
+            }
+        }
+
+
+        if (index == -1) {
+            return;
+        }
+
+
+        parent.remove(
+                appointmentsPanel
+        );
+
+
+        parent.add(
+                newAppointmentsPanel,
+                index
+        );
+
+
+        appointmentsPanel =
+                newAppointmentsPanel;
+
+
+        updateResponsiveLayout();
+
+
+        parent.revalidate();
+
+        parent.repaint();
+    }
+
+
+    // =====================================
+    // REFRESH SYSTEM OVERVIEW
+    // =====================================
+
+    private void refreshOverview() {
+
+        if (
+                overviewPanel == null
+                        || lowerPanel == null
+        ) {
+
+            return;
+        }
+
+
+        JPanel newOverviewPanel =
+                createOverviewPanel();
+
+
+        Container parent =
+                overviewPanel.getParent();
+
+
+        if (parent == null) {
+            return;
+        }
+
+
+        int index = -1;
+
+
+        Component[] components =
+                parent.getComponents();
+
+
+        for (
+                int i = 0;
+                i < components.length;
+                i++
+        ) {
+
+            if (
+                    components[i]
+                            == overviewPanel
+            ) {
+
+                index = i;
+
+                break;
+            }
+        }
+
+
+        if (index == -1) {
+            return;
+        }
+
+
+        parent.remove(
+                overviewPanel
+        );
+
+
+        parent.add(
+                newOverviewPanel,
+                index
+        );
+
+
+        overviewPanel =
+                newOverviewPanel;
+
+
+        updateResponsiveLayout();
+
+
+        parent.revalidate();
+
+        parent.repaint();
+    }
+
+
+    // =====================================
+    // DATE DISPLAY
+    // =====================================
+
+    private String formatDateForDisplay(
+            String date
     ) {
-        return;
-    }
+
+        if (
+                date == null
+                        || date.trim().isEmpty()
+        ) {
+
+            return "";
+        }
 
 
-    JPanel newAppointmentsPanel =
-            createAppointmentsPanel();
+        try {
+
+            LocalDate parsedDate =
+                    LocalDate.parse(date);
 
 
-    Container parent =
-            appointmentsPanel.getParent();
+            return parsedDate.format(
+                    java.time.format.DateTimeFormatter
+                            .ofPattern(
+                                    "dd.MM.yyyy"
+                            )
+            );
 
+        } catch (
+                java.time.format.DateTimeParseException e
+        ) {
 
-    if (parent == null) {
-        return;
-    }
-
-
-    int index = -1;
-
-
-    Component[] components =
-            parent.getComponents();
-
-
-    for (int i = 0; i < components.length; i++) {
-
-        if (components[i] == appointmentsPanel) {
-
-            index = i;
-
-            break;
+            return date;
         }
     }
-
-
-    if (index == -1) {
-        return;
-    }
-
-
-    parent.remove(
-            appointmentsPanel
-    );
-
-
-    parent.add(
-            newAppointmentsPanel,
-            index
-    );
-
-
-    appointmentsPanel =
-            newAppointmentsPanel;
-
-
-    updateResponsiveLayout();
-
-
-    parent.revalidate();
-    parent.repaint();
-}
 }

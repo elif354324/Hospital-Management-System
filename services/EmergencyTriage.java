@@ -4,172 +4,398 @@ import models.Patient;
 import structures.Heap;
 
 /**
- * Emergency Room triage system using Max-Heap for priority-based patient management
- * Prioritizes patients by severity (10 = most critical)
- * 
- * ADT Usage: MyHeap (Max-Heap) for priority queue
- * Time Complexity: O(log n) insert, O(log n) extract, O(n) remove
- */
-public class EmergencyTriage {
-    private Heap heap;
-    private int capacity;
-    private int totalTreated;
-    
-    /**
-     * Creates a new EmergencyTriage system with specified capacity
-     * @param capacity Maximum number of emergency patients
-     */
-    public EmergencyTriage(int capacity) { 
-        this.heap = new Heap(capacity);
-        this.capacity = capacity;
-        this.totalTreated = 0;
+
+* Emergency Room triage system using Max-Heap for priority-based
+* patient management.
+*
+* Patients with higher severity values have higher priority.
+* Severity: 10 = most critical.
+*
+* ADT Usage:
+* * Heap (Max-Heap): Priority-based emergency patient management
+*
+* Time Complexity:
+* * Insert: O(log n)
+* * Extract Max: O(log n)
+* * Remove: O(n)
+    */
+    public class EmergencyTriage {
+
+  private Heap heap;
+  private int capacity;
+  private int totalTreated;
+
+  /**
+
+  * Creates a new EmergencyTriage system.
+  *
+  * @param capacity Maximum number of emergency patients
+    */
+    public EmergencyTriage(int capacity) {
+
+    this.capacity = Math.max(1, capacity);
+    this.heap = new Heap(this.capacity);
+    this.totalTreated = 0;
     }
-    
-    /**
-     * Admits a patient to the emergency room
-     * @param p Patient to admit
-     * @return true if admitted successfully, false if at capacity
-     */
-    public boolean admit(Patient p) { 
-        if (heap.size() >= capacity) {
-            System.out.println("   [EMERGENCY] Emergency room at full capacity! Cannot admit: " + p.getName());
-            return false;
-        }
-        
-        heap.insert(p);
-        System.out.println("   [EMERGENCY] Admitted: " + p.getName() + 
-                         " | Severity: " + p.getSeverity() + "/10" +
-                         " | ER patients: " + heap.size() + "/" + capacity);
-        return true;
+
+  // ==================== CORE OPERATIONS ====================
+
+  /**
+
+  * Admits a patient to the emergency room.
+  *
+  * @param patient Patient to admit
+  * @return true if admitted successfully, false otherwise
+    */
+    public boolean admit(Patient patient) {
+
+    if (patient == null) {
+
+     System.out.println(
+             "   [EMERGENCY] Cannot admit a null patient."
+     );
+
+     return false;
+
     }
-    
-    /**
-     * Treats the next patient with highest priority (highest severity)
-     * @return The treated patient, or null if no patients
-     */
+
+    if (heap.size() >= capacity) {
+
+     System.out.println(
+             "   [EMERGENCY] Emergency room is at full capacity!"
+     );
+
+     System.out.println(
+             "   Cannot admit: "
+                     + patient.getName()
+     );
+
+     return false;
+
+    }
+
+    heap.insert(patient);
+
+    System.out.println(
+    "   [EMERGENCY] Admitted: "
+    + patient.getName()
+    );
+
+    System.out.println(
+    "   Severity: "
+    + patient.getSeverity()
+    + "/10"
+    );
+
+    System.out.println(
+    "   ER Patients: "
+    + heap.size()
+    + "/"
+    + capacity
+    );
+
+    return true;
+    }
+
+  /**
+
+  * Treats the patient with the highest severity.
+  *
+  * @return Treated patient, or null if ER is empty
+    */
     public Patient treatNext() {
-        Patient next = heap.extractMax();
-        if (next != null) {
-            totalTreated++;
-            System.out.println("   [TREATMENT] Treating patient: " + next.getName() +
-                             " | Severity: " + next.getSeverity() + "/10" +
-                             " | Total treated today: " + totalTreated);
-        } else {
-            System.out.println("   [EMERGENCY] No patients to treat.");
-        }
-        return next;
+
+    Patient nextPatient =
+    heap.extractMax();
+
+    if (nextPatient != null) {
+
+     totalTreated++;
+
+
+     System.out.println(
+             "   [TREATMENT] Treating patient: "
+                     + nextPatient.getName()
+     );
+
+     System.out.println(
+             "   Severity: "
+                     + nextPatient.getSeverity()
+                     + "/10"
+     );
+
+     System.out.println(
+             "   Total Treated: "
+                     + totalTreated
+     );
+
+    } else {
+
+     System.out.println(
+             "   [EMERGENCY] No patients waiting for treatment."
+     );
+
     }
-    
-    /**
-     * Removes a specific patient from emergency room
-     * @param patientId Patient ID to remove
-     * @return true if removed successfully, false if not found
-     */
+
+    return nextPatient;
+    }
+
+  /**
+
+  * Removes a specific patient from the emergency room.
+  *
+  * @param patientId Patient ID
+  * @return true if removed successfully
+    */
     public boolean removePatient(String patientId) {
-        boolean removed = heap.removeById(patientId);
-        if (removed) {
-            System.out.println("   [EMERGENCY] Removed patient from emergency room: " + patientId);
-        }
-        return removed;
+
+    if (patientId == null
+    || patientId.trim().isEmpty()) {
+
+     return false;
+
     }
-    
-    /**
-     * Views next patient without removing from heap
-     * @return Next patient to treat or null if empty
-     */
+
+    boolean removed =
+    heap.removeById(patientId.trim());
+
+    if (removed) {
+
+     System.out.println(
+             "   [EMERGENCY] Removed patient: "
+                     + patientId
+     );
+
+    }
+
+    return removed;
+    }
+
+  /**
+
+  * Views the highest-priority patient without removing them.
+  *
+  * @return Next emergency patient or null
+    */
     public Patient peekNext() {
-        return heap.peekMax();
+
+    return heap.peekMax();
     }
-    
-    /**
-     * Displays all emergency patients
-     */
-    public void display() { 
-        System.out.println("\n");
-        System.out.println("   =========================================");
-        System.out.println("          EMERGENCY ROOM STATUS");
-        System.out.println("   =========================================");
-        
-        if (!hasPatients()) {
-            System.out.println("\n   No patients in emergency room.");
-            System.out.println("   Status: READY for new admissions");
-        } else {
-            heap.display();
-        }
-        System.out.println("   ====================================================================");
+
+  // ==================== DISPLAY ====================
+
+  /**
+
+  * Displays emergency room status.
+    */
+    public void display() {
+
+    System.out.println("\n");
+
+    System.out.println(
+    "   ========================================="
+    );
+
+    System.out.println(
+    "          EMERGENCY ROOM STATUS"
+    );
+
+    System.out.println(
+    "   ========================================="
+    );
+
+    System.out.println(
+    "   Capacity: "
+    + getPatientCount()
+    + "/"
+    + capacity
+    );
+
+    System.out.println(
+    "   Occupancy: "
+    + String.format(
+    "%.1f",
+    getOccupancyPercentage()
+    )
+    + "%"
+    );
+
+    if (isCriticalCapacity()) {
+
+     System.out.println(
+             "   Status: CRITICAL CAPACITY"
+     );
+
+
+    } else if (!hasPatients()) {
+
+     System.out.println(
+             "   Status: READY FOR NEW ADMISSIONS"
+     );
+
+    } else {
+
+     System.out.println(
+             "   Status: ACTIVE"
+     );
+
     }
+
+    System.out.println(
+    "   -----------------------------------------"
+    );
+
+    if (!hasPatients()) {
+
+     System.out.println(
+             "   No patients currently in the emergency room."
+     );
     
-    // ==================== QUERY METHODS ====================
-    
-    /**
-     * Returns number of patients in emergency room
-     * @return Patient count
-     */
+
+    } else {
+
+     heap.display();
+
+    }
+
+    System.out.println(
+    "   ========================================="
+    );
+    }
+
+  // ==================== QUERY METHODS ====================
+
+  /**
+
+  * Returns the number of patients currently in the ER.
+    */
     public int getPatientCount() {
-        return heap.size();
+
+    return heap.size();
     }
-    
-    /**
-     * Returns emergency room capacity
-     * @return Maximum capacity
-     */
+
+  /**
+
+  * Alias for GUI/dashboard usage.
+    */
+    public int getCurrentPatientCount() {
+
+    return getPatientCount();
+    }
+
+  /**
+
+  * Returns maximum ER capacity.
+    */
     public int getCapacity() {
-        return capacity;
+
+    return capacity;
     }
-    
-    /**
-     * Checks if there are emergency patients waiting
-     * @return true if patients exist, false otherwise
-     */
+
+  /**
+
+  * Checks whether patients are waiting.
+    */
     public boolean hasPatients() {
-        return heap.size() > 0;
+
+    return heap.size() > 0;
     }
-    
-    /**
-     * Returns the current occupancy percentage
-     * @return Occupancy percentage (0-100)
-     */
+
+  /**
+
+  * Checks whether the ER is empty.
+    */
+    public boolean isEmpty() {
+
+    return heap.size() == 0;
+    }
+
+  /**
+
+  * Returns the current occupancy percentage.
+    */
     public double getOccupancyPercentage() {
-        return (heap.size() * 100.0) / capacity;
+
+    if (capacity <= 0) {
+    return 0.0;
     }
-    
-    /**
-     * Checks if emergency room is at critical capacity (>90%)
-     * @return true if critical capacity reached
-     */
+
+    return (heap.size() * 100.0)
+    / capacity;
+    }
+
+  /**
+
+  * Checks whether ER capacity is critical.
+    */
     public boolean isCriticalCapacity() {
-        return getOccupancyPercentage() > 90.0;
+
+    return getOccupancyPercentage() >= 90.0;
     }
-    
-    /**
-     * Returns total patients treated today
-     * @return Total treated count
-     */
+
+  /**
+
+  * Checks whether the emergency room is completely full.
+    */
+    public boolean isFull() {
+
+    return heap.size() >= capacity;
+    }
+
+  /**
+
+  * Returns total number of patients treated.
+    */
     public int getTotalTreated() {
-        return totalTreated;
+
+    return totalTreated;
     }
-    
-    // ==================== STATE MANAGEMENT ====================
-    
-    /**
-     * Creates a deep copy of the emergency triage system
-     * @return New EmergencyTriage with same state
-     */
+
+  // ==================== STATE MANAGEMENT ====================
+
+  /**
+
+  * Creates a deep copy for undo functionality.
+  *
+  * @return Independent EmergencyTriage copy
+    */
     public EmergencyTriage deepCopy() {
-        EmergencyTriage copy = new EmergencyTriage(this.capacity);
-        copy.heap = this.heap.deepCopy();
-        copy.totalTreated = this.totalTreated;
-        return copy;
+
+    EmergencyTriage copy =
+    new EmergencyTriage(this.capacity);
+
+    copy.heap =
+    this.heap.deepCopy();
+
+    copy.totalTreated =
+    this.totalTreated;
+
+    return copy;
     }
-    
-    /**
-     * Restores from a copy
-     * @param source Source to restore from
-     */
+
+  /**
+
+  * Restores emergency triage state.
+  *
+  * @param source Source state
+    */
     public void restoreFrom(EmergencyTriage source) {
-        this.heap = source.heap.deepCopy();
-        this.capacity = source.capacity;
-        this.totalTreated = source.totalTreated;
-        System.out.println("   [RESTORE] Emergency triage state restored.");
+
+    if (source == null) {
+    return;
     }
-}
+
+    this.heap =
+    source.heap.deepCopy();
+
+    this.capacity =
+    source.capacity;
+
+    this.totalTreated =
+    source.totalTreated;
+
+    System.out.println(
+    "   [RESTORE] Emergency triage state restored."
+    );
+    }
+    }

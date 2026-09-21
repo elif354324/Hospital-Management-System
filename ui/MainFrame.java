@@ -1,15 +1,27 @@
 package ui;
 
+import models.User;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 public class MainFrame extends JFrame {
+
+    // =========================================
+    // CURRENT USER
+    // =========================================
+
+    private final User currentUser;
+
+
+    // =========================================
+    // COMPONENTS
+    // =========================================
 
     private CardLayout cardLayout;
 
@@ -26,7 +38,22 @@ public class MainFrame extends JFrame {
     private EmergencyPanel emergencyPanel;
 
 
-    public MainFrame() {
+    // =========================================
+    // CONSTRUCTOR
+    // =========================================
+
+    public MainFrame(User user) {
+
+        if (user == null) {
+
+            throw new IllegalArgumentException(
+                    "User cannot be null."
+            );
+        }
+
+
+        this.currentUser = user;
+
 
         menuButtons =
                 new HashMap<>();
@@ -42,6 +69,16 @@ public class MainFrame extends JFrame {
 
 
         setVisible(true);
+    }
+
+
+    // =========================================
+    // CURRENT USER
+    // =========================================
+
+    public User getCurrentUser() {
+
+        return currentUser;
     }
 
 
@@ -183,7 +220,8 @@ public class MainFrame extends JFrame {
                 createFooter()
         );
 
-
+        updateMenuVisibility(); 
+        
         add(
                 sidebar,
                 BorderLayout.WEST
@@ -238,7 +276,11 @@ public class MainFrame extends JFrame {
                 )
         );
 
-        logo.setForeground(UITheme.PRIMARY_LIGHT);
+
+        logo.setForeground(
+                UITheme.PRIMARY_LIGHT
+        );
+
 
         logo.setAlignmentX(
                 Component.CENTER_ALIGNMENT
@@ -314,7 +356,9 @@ public class MainFrame extends JFrame {
         logoPanel.add(subtitle);
 
 
-        sidebar.add(logoPanel);
+        sidebar.add(
+                logoPanel
+        );
     }
 
 
@@ -323,14 +367,14 @@ public class MainFrame extends JFrame {
     // =========================================
 
     private void addMenuButton(
-
             String text,
-
             String page
     ) {
 
         SidebarButton button =
-                new SidebarButton(text);
+                new SidebarButton(
+                        text
+                );
 
 
         button.setMaximumSize(
@@ -352,7 +396,9 @@ public class MainFrame extends JFrame {
         );
 
 
-        sidebar.add(button);
+        sidebar.add(
+                button
+        );
     }
 
 
@@ -372,7 +418,6 @@ public class MainFrame extends JFrame {
 
 
         separator.setMaximumSize(
-
                 new Dimension(
                         Integer.MAX_VALUE,
                         1
@@ -513,7 +558,11 @@ public class MainFrame extends JFrame {
                 "PATIENTS"
         );
 
-        doctorPanel = new DoctorPanel();
+
+        doctorPanel =
+                new DoctorPanel();
+
+
         mainPanel.add(
                 doctorPanel,
                 "DOCTORS"
@@ -525,7 +574,11 @@ public class MainFrame extends JFrame {
                 "APPOINTMENTS"
         );
 
-        emergencyPanel = new EmergencyPanel();
+
+        emergencyPanel =
+                new EmergencyPanel();
+
+
         mainPanel.add(
                 emergencyPanel,
                 "EMERGENCY"
@@ -544,46 +597,113 @@ public class MainFrame extends JFrame {
         );
 
 
-        showPage("DASHBOARD");
+        showPage(
+                "DASHBOARD"
+        );
     }
+
+
+    // =========================================
+    // RESPONSIVE LAYOUT
+    // =========================================
 
     private void setupResponsiveLayout() {
 
-    addComponentListener(
-            new ComponentAdapter() {
+        addComponentListener(
+                new ComponentAdapter() {
 
-                @Override
-                public void componentResized(
-                        ComponentEvent e
-                ) {
+                    @Override
+                    public void componentResized(
+                            ComponentEvent e
+                    ) {
 
-                    int width =
-                            getWidth();
+                        int width =
+                                getWidth();
 
-                    if (width < 1000) {
 
-                        sidebar.setPreferredSize(
-                                new Dimension(
-                                        180,
-                                        0
-                                )
-                        );
+                        if (width < 1000) {
 
-                    } else {
+                            sidebar.setPreferredSize(
+                                    new Dimension(
+                                            180,
+                                            0
+                                    )
+                            );
 
-                        sidebar.setPreferredSize(
-                                new Dimension(
-                                        240,
-                                        0
-                                )
-                        );
+                        } else {
+
+                            sidebar.setPreferredSize(
+                                    new Dimension(
+                                            240,
+                                            0
+                                    )
+                            );
+                        }
+
+
+                        revalidate();
+
+                        repaint();
                     }
-
-                    revalidate();
-                    repaint();
                 }
-            }
-    );
+        );
+    }
+
+
+    // =========================================
+    // AUTHORIZATION
+    // =========================================
+
+    private boolean hasAccess(
+            String page
+    ) {
+
+        if (currentUser == null) {
+
+            return false;
+        }
+
+
+        switch (
+                currentUser.getRole()
+        ) {
+
+            case ADMIN:
+
+                return true;
+
+
+            case DOCTOR:
+
+            case RECEPTIONIST:
+
+                return !page.equals(
+                        "SYSTEM"
+                );
+
+
+            default:
+
+                return false;
+        }
+    }
+
+    private void updateMenuVisibility() {
+
+    for (Map.Entry<String, SidebarButton> entry
+            : menuButtons.entrySet()) {
+
+        String page = entry.getKey();
+
+        SidebarButton button = entry.getValue();
+
+        button.setVisible(
+                hasAccess(page)
+        );
+    }
+
+    sidebar.revalidate();
+    sidebar.repaint();
 }
 
 
@@ -591,31 +711,67 @@ public class MainFrame extends JFrame {
     // PAGE NAVIGATION
     // =========================================
 
- private void showPage(
-        String page
-) {
+    private void showPage(
+            String page
+    ) {
 
-    cardLayout.show(
-            mainPanel,
-            page
-    );
+        // =====================================
+        // ACCESS CONTROL
+        // =====================================
 
-    updateSelectedButton(page);
+        if (!hasAccess(page)) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "You do not have permission to access this section.",
+                    "Access Denied",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
 
 
-    if (page.equals("DASHBOARD")) {
+        // =====================================
+        // SHOW PAGE
+        // =====================================
 
-        dashboardPanel.refresh();
+        cardLayout.show(
+                mainPanel,
+                page
+        );
 
-    } else if (page.equals("DOCTORS")) {
 
-        doctorPanel.refresh();
+        updateSelectedButton(
+                page
+        );
 
-    } else if (page.equals("EMERGENCY")) {
 
-        emergencyPanel.refresh();
+        // =====================================
+        // REFRESH PAGE DATA
+        // =====================================
+
+        if (page.equals(
+                "DASHBOARD"
+        )) {
+
+            dashboardPanel.refresh();
+
+
+        } else if (page.equals(
+                "DOCTORS"
+        )) {
+
+            doctorPanel.refresh();
+
+
+        } else if (page.equals(
+                "EMERGENCY"
+        )) {
+
+            emergencyPanel.refresh();
+        }
     }
-}
 
 
     // =========================================
@@ -633,11 +789,15 @@ public class MainFrame extends JFrame {
 
             boolean selected =
                     entry.getKey()
-                            .equals(selectedPage);
+                            .equals(
+                                    selectedPage
+                            );
 
 
             entry.getValue()
-                    .setSelected(selected);
+                    .setSelected(
+                            selected
+                    );
         }
     }
 }
